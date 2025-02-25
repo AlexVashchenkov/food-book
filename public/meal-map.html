@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Карта блюд</title>
+  <link rel="stylesheet" href="styles/styles.css">
+  <!link rel="stylesheet" href="styles/outline-prototype-safe.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+  <link rel="stylesheet" href="styles/swiper.css">
+  <script src="scripts/script.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script> <!--  -->
+</head>
+<body>
+<header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Главная</a></li>
+      <li><a href="meal-map.html">Карта блюд</a></li>
+      <li><a href="meal.html">Блюдо</a></li>
+      <li><a href="profile.html">Профиль</a></li>
+      <li><a href="profile.html"><img src="img/profile_pic.jpg" alt="фото профиля" class="login-profile-photo"></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <div class="swiper-container">
+    <div class="swiper-wrapper">
+
+      <div class="swiper-slide" data-category="breakfast">
+        <h2>Завтрак</h2>
+        <div class="meal-cards-container">
+          <div class="meal-card">
+            <img src="img/yougurt_cereal.jpg" alt="Завтрак 1">
+            <p>Йогурт с гранолой</p>
+          </div>
+          <div class="meal-card">
+            <img src="img/yougurt_cereal.jpg" alt="Завтрак 2">
+            <p>Банановые панкейки</p>
+          </div>
+          <div class="meal-card">
+            <img src="img/yougurt_cereal.jpg" alt="Завтрак 3">
+            <p>Гречка с молоком</p>
+          </div>
+          <div class="meal-card">
+            <img src="img/yougurt_cereal.jpg" alt="Завтрак 3">
+            <p>Гречка с молоком</p>
+          </div>
+          <div class="meal-card">
+            <img src="img/yougurt_cereal.jpg" alt="Завтрак 3">
+            <p>Гречка с молоком</p>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-slide" data-category="lunch">
+        <h2>Обед</h2>
+        <div class="meal-cards-container">
+          <div class="meal-card">
+            <img src="img/chicken_with_pasta.jpg" alt="Обед 1">
+            <p>Курица с макаронами</p>
+          </div>
+          <div class="meal-card">
+            <img src="img/pasta_with_shrimps.jpg" alt="Обед 2">
+            <p>Паста с креветками</p>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-slide" data-category="dinner">
+        <h2>Ужин</h2>
+        <div class="meal-cards-container">
+          <div class="meal-card">
+            <img src="dinner1.jpg" alt="Ужин 1">
+            <p>Стейк с овощами</p>
+          </div>
+          <div class="meal-card">
+            <img src="dinner2.jpg" alt="Ужин 2">
+            <p>Салат Цезарь</p>
+          </div>
+          <div class="meal-card">
+            <img src="dinner3.jpg" alt="Ужин 2">
+            <p>Салат Цезарь</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </div>
+</main>
+
+<footer>
+  <p>Alexey Vashchenkov &copy; 2025</p>
+</footer>
+</body>
+</html>
