@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main class="meal-main">
+  <div class="meal-photo-container">
+    <img src="{{meal.image}}" alt="Фото блюда" class="meal-photo">
+  </div>
+  <div class="meal-detail">
+    <h2>{{meal.title}}</h2>
+    <h3>Ингредиенты:</h3>
+    <ul>
+      {{#each meal.ingredients}}
+        <li>{{this}}</li>
+      {{/each}}
+    </ul>
+    <h3>Рецепт:</h3>
+    <ol>
+      {{#each meal.steps}}
+        <li>{{this}}</li>
+      {{/each}}
+    </ol>
+  </div>
+</main>
+{{> footer}}
+</body>

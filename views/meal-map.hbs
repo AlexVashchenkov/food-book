@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main>
+  <div class="swiper-container">
+    <div class="swiper-wrapper">
+      {{#each categories}}
+        <div class="swiper-slide" data-category="{{this.name}}">
+          <h2>{{this.name}}</h2>
+          <div class="meal-cards-container">
+            {{#each this.meals}}
+              {{> meal_card}}
+            {{/each}}
+          </div>
+        </div>
+      {{/each}}
+    </div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </div>
+</main>
+{{> footer}}
+</body>
+</html>

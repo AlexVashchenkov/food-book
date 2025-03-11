@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String
+  age       Int
+  photo     String
+  categories Category[] // Связь с категориями
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String
+  color     String
+  userId    Int
+  user      User       @relation(fields: [userId], references: [id]) // Связь с пользователем
+  dishes    Dish[]     // Связь с блюдами
+}
+
+model Dish {
+  id          Int         @id @default(autoincrement())
+  name        String
+  category    String
+  photo       String
+  categoryId  Int
+  categoryRelation Category @relation(fields: [categoryId], references: [id]) // Связь с категорией
+  ingredients Ingredient[] // Связь с ингредиентами
+  recipe      Recipe?     // Связь с рецептом (one-to-one)
+}
+
+model Recipe {
+  id      Int    @id @default(autoincrement())
+  steps   String
+  dishId  Int    @unique
+  dish    Dish   @relation(fields: [dishId], references: [id]) // Связь с блюдом
+}
+
+model Ingredient {
+  id      Int    @id @default(autoincrement())
+  name    String
+  unit    String
+  calories Int?
+  photo   String?
+  dishes  Dish[] // Связь с блюдами
+}

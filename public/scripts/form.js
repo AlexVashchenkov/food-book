@@ -30,7 +30,7 @@
 });
 
 // Превью изображения
-document.getElementById('photo').addEventListener('change', function(e) {
+document.getElementById('photo').addEventListener('change', function() {
   const preview = document.getElementById('imagePreview');
   preview.innerHTML = '';
 

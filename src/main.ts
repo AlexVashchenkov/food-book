@@ -10,6 +10,12 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
 
+  // Регистрация частичных шаблонов
+  // eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-unsafe-assignment
+  const hbs = require('hbs');
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
+  hbs.registerPartials(join(__dirname, '..', 'views', 'partials'));
+
   await app.listen(process.env.PORT ?? 3000);
 }
 

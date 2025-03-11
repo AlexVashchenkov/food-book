@@ -28,6 +28,10 @@ form {
     font-weight: bold;
 }
 
+.form-title {
+    text-align: center;
+}
+
 .form-group input[type="text"],
 .form-group textarea,
 .form-group select {
