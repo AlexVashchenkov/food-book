@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактирование категории</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main>
+  <div class="edit-container">
+    <h1 class="form-title">Редактирование категории</h1>
+    <form id="categoryForm" method="POST" action="/categories/{{category.id}}">
+      <input type="hidden" name="_method" value="PATCH">
+
+      <div class="form-group">
+        <label for="name">Название:</label>
+        <input type="text" id="name" name="name" value="{{category.name}}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="userId">Id пользователя</label>
+        <input type="number" id="userId" name="userId" value="{{category.userId}}" required readonly>
+      </div>
+
+      <div class="form-group">
+        <label for="color">Цвет:</label>
+        <input type="color" id="color" name="color" value="{{category.color}}" required>
+      </div>
+
+      <button type="submit">Сохранить данные</button>
+    </form>
+  </div>
+</main>
+{{> footer}}
+<script>
+  document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      name: form.name.value,
+      color: form.color.value
+    };
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        window.location.href = '/categories';
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Ошибка при сохранении');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ошибка при сохранении категории');
+    }
+  });
+</script>
+</body>
+</html>

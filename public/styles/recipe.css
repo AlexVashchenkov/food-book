@@ -1,0 +1,37 @@
+﻿.recipe-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.recipe-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.recipe-photo {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 20px;
+}
+.recipe-title {
+    margin: 0;
+    font-size: 2rem;
+}
+.recipe-content {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    white-space: pre-line;
+}
+.recipe-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+.ingredients-list {
+    list-style-type: decimal;
+    margin: 20px 0;
+    padding-left: 20px;
+}

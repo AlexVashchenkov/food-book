@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Список пользователей</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+
+<main class="container">
+  <div class="page-header">
+    <h1>Список пользователей</h1>
+    {{#if users.length}}
+      <a href="/users/add" class="add-user-btn">Добавить пользователя</a>
+    {{/if}}
+  </div>
+
+  {{#if users.length}}
+    <div class="users-grid">
+      {{#each users}}
+        <div class="user-card">
+          <a href="/users/{{this.id}}" style="text-decoration: none; color: black">
+            {{#if this.photo}}
+              <img src="{{this.photo}}" alt="{{this.name}}" class="user-avatar">
+            {{else}}
+              <img src="public/img/no_avatar.jpg" alt="{{this.name}}" class="user-avatar">
+            {{/if}}
+            <div class="user-info">
+              <h3 class="user-name">{{this.name}}</h3>
+              <p class="user-age">{{this.age}} лет</p>
+            </div>
+          </a>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="no-users">
+      <p>Пока нет зарегистрированных пользователей. <a href="/users/add">Добавить первого пользователя</a></p>
+    </div>
+  {{/if}}
+</main>
+{{> footer}}
+</body>
+</html>

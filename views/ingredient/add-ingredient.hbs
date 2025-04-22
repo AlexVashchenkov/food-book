@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавление ингредиента</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main>
+  <div class="edit-container">
+    <h1 class="form-title">Добавление ингредиента</h1>
+    <form id="ingredientForm" method="POST" action="/ingredients">
+
+      <div class="form-group">
+        <label for="name">Название:</label>
+        <input type="text" id="name" name="name"  required>
+      </div>
+
+      <div class="form-group">
+        <label for="unit">Единица измерения:</label>
+        <select id="unit" name="unit" required>
+          <option value="г.">Граммы (г.)</option>
+          <option value="мл.">Миллилитры (мл.)</option>
+          <option value="шт.">Штуки (шт.)</option>
+          <option value="ч. л.">Чайные ложки (ч. л.)</option>
+          <option value="ст. л.">Столовые ложки (ст. л.)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="calories">Калории (на 100г/мл):</label>
+        <input type="number" id="calories" name="calories">
+      </div>
+
+      <button type="submit">Добавить ингредиент</button>
+    </form>
+  </div>
+</main>
+{{> footer}}
+<script>
+  document.getElementById('ingredientForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      name: form.name.value,
+      unit: form.unit.value,
+      calories: form.calories.value ? parseInt(form.calories.value) : null
+    };
+    console.log(data)
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        window.location.href = '/ingredients';
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Ошибка при сохранении');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ошибка при добавлении ингредиента');
+    }
+  });
+</script>
+</body>
+</html>

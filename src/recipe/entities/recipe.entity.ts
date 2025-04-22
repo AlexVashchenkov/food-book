@@ -1,21 +1,16 @@
-﻿import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-} from 'typeorm';
 import { Dish } from '../../dish/entities/dish.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Recipe {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text')
+  @Column({ type: 'text' })
   steps: string;
 
-  @OneToOne(() => Dish, (dish) => dish.recipe)
-  @JoinColumn()
-  dish_Id: number;
+  @Column({ unique: true })
+  dishId: number;
+
+  dish: Dish;
 }

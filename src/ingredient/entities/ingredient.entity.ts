@@ -1,24 +1,26 @@
-﻿import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
-import { Dish } from '../../dish/entities/dish.entity';
+import { DishIngredient } from './dish-ingredient.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity()
 export class Ingredient {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column()
-  unit: string;
+  unit: string; // Базовая единица измерения (г, мл, шт и т.д.)
 
   @Column({ nullable: true })
-  calories: number;
+  calories?: number;
 
   @Column({ nullable: true })
-  photo: string;
+  photo?: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  @ManyToMany(() => Dish, (dish) => dish.ingredients)
-  dishes: Dish[];
+  @OneToMany(
+    () => DishIngredient,
+    (dishIngredient) => dishIngredient.ingredient,
+  )
+  dishes: DishIngredient[];
 }

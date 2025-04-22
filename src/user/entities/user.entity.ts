@@ -1,27 +1,16 @@
-﻿import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
+import { Dish } from '../../dish/entities/dish.entity';
 import { Category } from '../../category/entities/category.entity';
 
-@Entity()
 export class User {
-  @PrimaryGeneratedColumn()
   id: number;
-
-  @Column()
   name: string;
-
-  @Column()
   age: number;
+  password: string;
+  photo: string | null;
+  categories?: Category[];
+  dishes?: Dish[];
 
-  @Column()
-  photo: string;
-
-  @OneToMany(() => Category, (category) => category.user)
-  @JoinColumn()
-  categories: Category[];
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
 }

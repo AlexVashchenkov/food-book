@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,8 +11,10 @@ model User {
   id        Int        @id @default(autoincrement())
   name      String
   age       Int
-  photo     String
-  categories Category[] // Связь с категориями
+  password  String
+  photo     String?
+  categories Category[]
+  dishes    Dish[]
 }
 
 model Category {
@@ -26,33 +22,46 @@ model Category {
   name      String
   color     String
   userId    Int
-  user      User       @relation(fields: [userId], references: [id]) // Связь с пользователем
-  dishes    Dish[]     // Связь с блюдами
+  user      User       @relation(fields: [userId], references: [id])
+  dishes    Dish[]
 }
 
 model Dish {
   id          Int         @id @default(autoincrement())
   name        String
-  category    String
-  photo       String
+  photo       String?
   categoryId  Int
-  categoryRelation Category @relation(fields: [categoryId], references: [id]) // Связь с категорией
-  ingredients Ingredient[] // Связь с ингредиентами
-  recipe      Recipe?     // Связь с рецептом (one-to-one)
+  category    Category    @relation(fields: [categoryId], references: [id])
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  ingredients DishIngredient[]
+  recipe      Recipe?
 }
 
 model Recipe {
   id      Int    @id @default(autoincrement())
   steps   String
   dishId  Int    @unique
-  dish    Dish   @relation(fields: [dishId], references: [id]) // Связь с блюдом
+  dish    Dish   @relation(fields: [dishId], references: [id])
 }
 
 model Ingredient {
-  id      Int    @id @default(autoincrement())
-  name    String
-  unit    String
-  calories Int?
-  photo   String?
-  dishes  Dish[] // Связь с блюдами
+  id        Int             @id @default(autoincrement())
+  name      String          @unique
+  unit      String          // Базовая единица измерения (г, мл, шт и т.д.)
+  calories  Int?
+  photo     String?
+  dishes    DishIngredient[]
+}
+
+// Таблица связи многие-ко-многим с дополнительными полями
+model DishIngredient {
+  id           Int         @id @default(autoincrement())
+  dishId       Int
+  ingredientId Int
+  amount       Float       // Количество ингредиента
+  dish         Dish        @relation(fields: [dishId], references: [id])
+  ingredient   Ingredient  @relation(fields: [ingredientId], references: [id])
+
+  @@unique([dishId, ingredientId]) // Уникальная пара блюдо-ингредиент
 }

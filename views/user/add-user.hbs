@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавление пользователя</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main>
+  <div class="edit-container">
+    <h1 class="form-title">Добавление пользователя</h1>
+    <form id="userForm" action="/users" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="age">Возраст:</label>
+        <input type="number" id="age" name="age" required>
+      </div>
+
+      <div class="form-group">
+        <label for="image">Фотография:</label>
+        <input type="file" id="image" name="image" accept="image/*">
+        <div id="imagePreview"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль:</label>
+        <input type="text" id="password" name="password" required>
+      </div>
+
+      <button type="submit">Добавить пользователя</button>
+    </form>
+  </div>
+</main>
+{{> footer}}
+<script>
+  document.getElementById('userForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+      if (result.redirect) {
+        window.location.href = result.redirect;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+﻿.meal-photo-container {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.meal-main {
+    display: flex;
+}
+
+.meal-detail {
+    margin-top: 50px;
+    gap: 20px;
+    width: 50%;
+}
+
+.meal-photo {
+    width: 50%;
+    height: auto;
+    border-radius: 10px;
+}
+
+ .meal-actions {
+     margin-top: 20px;
+     display: flex;
+     gap: 15px;
+ }
+.btn-edit, .btn-delete {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-edit {
+    background-color: #4CAF50;
+    text-decoration: none;
+    color: white;
+}
+.btn-delete {
+    background-color: #4CAF50;
+    text-decoration: none;
+    color: white;
+}

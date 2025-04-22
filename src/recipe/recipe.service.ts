@@ -1,0 +1,97 @@
+import { PrismaService } from '../../prisma/prisma.service';
+import { CreateRecipeDto } from './dto/create-recipe.dto';
+import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class RecipeService {
+  constructor(private prisma: PrismaService) {}
+
+  async findAll() {
+    return this.prisma.recipe.findMany({
+      include: {
+        dish: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        id: 'asc',
+      },
+    });
+  }
+
+  async findOne(id: number) {
+    return this.prisma.recipe.findUnique({
+      where: { id },
+      include: {
+        dish: {
+          include: {
+            category: true,
+            ingredients: true,
+          },
+        },
+      },
+    });
+  }
+
+  async create(createRecipeDto: CreateRecipeDto) {
+    return this.prisma.recipe.create({
+      data: {
+        steps: createRecipeDto.steps,
+        dish: {
+          connect: { id: createRecipeDto.dishId },
+        },
+      },
+      include: {
+        dish: true,
+      },
+    });
+  }
+
+  async update(id: number, updateRecipeDto: UpdateRecipeDto) {
+    return this.prisma.recipe.update({
+      where: { id },
+      data: {
+        steps: updateRecipeDto.steps,
+        ...(updateRecipeDto.dishId && {
+          dish: {
+            connect: { id: updateRecipeDto.dishId },
+          },
+        }),
+      },
+      include: {
+        dish: true,
+      },
+    });
+  }
+
+  async remove(id: number) {
+    return this.prisma.recipe.delete({
+      where: { id },
+    });
+  }
+
+  async getDishesWithoutRecipes() {
+    const dishesWithRecipes = await this.prisma.recipe.findMany({
+      select: {
+        dishId: true,
+      },
+    });
+
+    const dishIdsWithRecipes = dishesWithRecipes.map((r) => r.dishId);
+
+    return this.prisma.dish.findMany({
+      where: {
+        id: {
+          notIn: dishIdsWithRecipes,
+        },
+      },
+    });
+  }
+
+  async getAllDishes() {
+    return this.prisma.dish.findMany();
+  }
+}

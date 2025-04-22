@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Список рецептов</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+
+<main class="container">
+  <div class="page-header">
+    <h1>Рецепты</h1>
+    <a href="/recipes/add" class="add-recipe-btn">Добавить рецепт</a>
+  </div>
+
+  {{#if recipes.length}}
+    <div class="recipes-grid">
+      {{#each recipes}}
+        <div class="recipe-card">
+          <h3 class="recipe-dish">{{this.dish.name}}</h3>
+          <p class="recipe-steps">{{this.steps}}</p>
+          <div class="recipe-actions">
+            <a href="/recipes/{{this.id}}">Подробнее</a>
+            <a href="/dishes/{{this.dishId}}/edit">Редактировать</a>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="no-recipes">
+      <p>Пока нет рецептов. <a href="/recipes/add">Добавить первый рецепт</a></p>
+    </div>
+  {{/if}}
+</main>
+
+{{> footer}}
+</body>
+</html>

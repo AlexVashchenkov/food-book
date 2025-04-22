@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main class="meal-main">
+  <div class="meal-photo-container">
+    <img src="/uploads/{{meal.photo}}" alt="Фото блюда" class="meal-photo">
+  </div>
+  <div class="meal-detail">
+    <h2>{{meal.name}}</h2>
+    <h3>Категория: {{meal.category.name}}</h3>
+
+    {{#if meal.ingredients.length}}
+      <h3>Ингредиенты:</h3>
+      <ol class="ingredients-list">
+        {{#each meal.ingredients}}
+          <li>{{this.name}}: {{this.amount}}{{#if this.unit}}{{this.unit}}{{/if}}</li>
+        {{/each}}
+      </ol>
+    {{else}}
+      <p>Нет информации об ингредиентах</p>
+    {{/if}}
+
+    {{#if meal.recipe}}
+      <h3>Рецепт:</h3>
+      <p>{{meal.recipe.steps}}</p>
+    {{else}}
+      <p>Рецепт не указан</p>
+    {{/if}}
+    <div class="meal-actions">
+      <a href="/dishes/{{meal.id}}/edit" class="btn-edit">Редактировать блюдо</a>
+      <button id="deleteDishBtn" class="btn-delete">Удалить блюдо</button>
+    </div>
+  </div>
+</main>
+{{> footer}}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const deleteBtn = document.getElementById('deleteDishBtn');
+
+    deleteBtn.addEventListener('click', async () => {
+      if (!confirm('Вы уверены, что хотите удалить это блюдо? Это действие нельзя отменить.')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/dishes/{{meal.id}}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          window.location.href = '/dishes';
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Ошибка при удалении блюда');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Произошла ошибка при удалении блюда');
+      }
+    });
+  });
+</script>
+</body>

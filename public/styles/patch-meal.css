@@ -1,0 +1,21 @@
+﻿.ingredients-container {
+    margin-top: 10px;
+}
+.ingredient-group {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+    gap: 10px;
+}
+.ingredient-input {
+    flex-grow: 1;
+}
+
+.btn-ingredient:hover {
+    background-color: #e0e0e0;
+}
+.current-photo {
+    max-width: 200px;
+    margin-top: 10px;
+    display: block;
+}
