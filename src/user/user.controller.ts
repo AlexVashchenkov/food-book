@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Render,
-  Sse,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,51 +18,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { catchError, EMPTY, fromEvent, map, Observable } from 'rxjs';
-import { EventEmitter2 } from 'eventemitter2';
 
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private eventEmitter: EventEmitter2,
-  ) {}
-
-  @Sse('events') // Делаем эндпоинт /users/events
-  sse(): Observable<MessageEvent> {
-    return fromEvent(this.eventEmitter, 'user.change').pipe(
-      map((data: any) => {
-        const response = {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-          type: data.type,
-          user: {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-            id: data.user.id,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-            name: data.user.name,
-          },
-        };
-        return { data: JSON.stringify(response) } as MessageEvent;
-      }),
-      catchError((err) => {
-        console.error('SSE error:', err);
-        return EMPTY;
-      }),
-    );
-  }
-
-  // Helper method to emit events
-  private emitUserEvent(type: string, user: any) {
-    this.eventEmitter.emit('user.event', {
-      type,
-      user: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-        id: user.id,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-        name: user.name,
-      },
-    });
-  }
+  constructor(private readonly userService: UserService) {}
 
   @Get()
   @Render('users')
@@ -122,7 +80,6 @@ export class UserController {
     }
 
     const user = await this.userService.create(createUserDto);
-    this.emitUserEvent('create', user);
     return res.redirect('/users');
   }
 
@@ -160,7 +117,6 @@ export class UserController {
       const user = await this.userService.findOne(+id);
       await this.userService.remove(+id);
 
-      this.emitUserEvent('delete', user);
       return res.redirect('/users');
     } catch (error) {
       console.error('Delete error:', error);

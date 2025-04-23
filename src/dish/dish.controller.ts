@@ -93,7 +93,10 @@ export class DishController {
     }
 
     const dish = await this.dishService.create(createDishDto);
-    return { redirect: `/dishes/${dish.id}` };
+    if (!dish) {
+      return { success: false, redirect: `/dishes` };
+    }
+    return { success: false, redirect: `/dishes/${dish.id}` };
   }
 
   @Delete(':id')

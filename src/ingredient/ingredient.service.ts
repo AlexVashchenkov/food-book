@@ -39,4 +39,24 @@ export class IngredientService {
       where: { id },
     });
   }
+
+  async findAllPaginated(skip: number, take: number) {
+    return this.prisma.ingredient.findMany({
+      skip,
+      take,
+    });
+  }
+
+  async countAll(): Promise<number> {
+    return this.prisma.ingredient.count();
+  }
+
+  async getIngredientDishes(id: number) {
+    return this.prisma.ingredient.findUnique({
+      where: { id },
+      include: {
+        dishes: true,
+      },
+    });
+  }
 }

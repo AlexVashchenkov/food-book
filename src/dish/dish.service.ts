@@ -9,6 +9,9 @@ export class DishService {
 
   async create(createDishDto: CreateDishDto, photoFile?: Express.Multer.File) {
     const photoPath = photoFile ? photoFile.filename : 'default.jpg';
+    if (Number(createDishDto.userId)) {
+      createDishDto.userId = Number(createDishDto.userId);
+    }
 
     const user = await this.prisma.user.findUnique({
       where: { id: createDishDto.userId },
@@ -52,6 +55,8 @@ export class DishService {
 
     if (createDishDto.ingredients?.length) {
       for (const { name, amount } of createDishDto.ingredients) {
+        if (!name) continue; // или выбрось ошибку
+
         let ingredient = await this.prisma.ingredient.findFirst({
           where: { name },
         });

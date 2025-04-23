@@ -33,7 +33,8 @@
         <div id="ingredientsContainer" class="ingredients-container">
           <div class="ingredient-group">
             <input type="text" name="ingredientName" class="ingredient-input" placeholder="Название" required>
-            <input type="number" name="ingredientAmount" class="ingredient-amount" step="0.01" min="0" placeholder="Количество" required>
+            <input type="number" name="ingredientAmount" class="ingredient-amount" step="0.01" min="0"
+                   placeholder="Количество" required>
             <button type="button" class="btn-ingredient remove-ingredient" disabled>-</button>
             <button type="button" class="btn-ingredient add-ingredient">+</button>
           </div>
@@ -92,51 +93,54 @@
       });
     }
 
-    document.getElementById('mealForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('mealForm');
 
-      const form = e.target;
-      const formData = new FormData();
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      formData.append('category', form.category.value);
-      formData.append('userId', form.userId.value);
-      formData.append('name', form.name.value);
-      if (form.steps.value) formData.append('steps', form.steps.value);
-      if (form.photo.files[0]) formData.append('photo', form.photo.files[0]);
+        const ingredients = [];
+        const names = form.querySelectorAll('.ingredient-input');
+        const amounts = form.querySelectorAll('.ingredient-amount');
 
-      // ✅ Собираем ингредиенты в JSON
-      const ingredients = [];
-      const names = form.querySelectorAll('.ingredient-input');
-      const amounts = form.querySelectorAll('.ingredient-amount');
-
-      names.forEach((input, index) => {
-        const name = input.value.trim();
-        const amount = amounts[index].value.trim();
-        if (name && amount) {
-          ingredients.push({ name, amount });
-        }
-      });
-
-      formData.append('ingredients', JSON.stringify(ingredients));
-
-      try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          body: formData,
+        names.forEach((input, index) => {
+          const name = input.value.trim();
+          const amount = amounts[index].value.trim();
+          if (name && amount) {
+            ingredients.push({ name, amount: Number(amount) });
+          }
         });
 
-        if (response.ok) {
-          const result = await response.json();
-          window.location.href = result.redirect || '/dishes';
-        } else {
-          alert('Ошибка при создании блюда');
-        }
-      } catch (error) {
-        console.error('Ошибка:', error);
-        alert('Произошла ошибка при отправке данных');
-      }
-    });
+        const dto = {
+          category: form.category.value.trim(),
+          userId: Number(form.userId.value),
+          name: form.name.value.trim(),
+          steps: form.steps.value.trim(),
+          ingredients,
+          // photo: пока исключён — либо добавим base64 позже
+        };
 
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dto),
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            window.location.href = result.redirect || '/dishes';
+          } else {
+            alert('Ошибка при создании блюда');
+          }
+        } catch (error) {
+          console.error('Ошибка:', error);
+          alert('Произошла ошибка при отправке данных');
+        }
+      });
+    });
   });
 </script>
 

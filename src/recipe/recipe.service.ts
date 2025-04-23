@@ -91,7 +91,22 @@ export class RecipeService {
     });
   }
 
-  async getAllDishes() {
-    return this.prisma.dish.findMany();
+  async getDish(dishId: number) {
+    return this.prisma.dish.findUnique({
+      where: {
+        id: dishId,
+      },
+    });
+  }
+
+  async findAllPaginated(skip: number, take: number) {
+    return this.prisma.recipe.findMany({
+      skip,
+      take,
+    });
+  }
+
+  async countAll(): Promise<number> {
+    return this.prisma.recipe.count();
   }
 }

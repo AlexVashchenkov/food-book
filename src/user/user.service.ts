@@ -57,15 +57,12 @@ export class UserService {
   }
 
   async remove(id: number) {
-    // 1. Проверяем существование пользователя
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    // 2. Удаляем в транзакции (все или ничего)
     return this.prisma.$transaction(async (prisma) => {
-      // Удаляем рецепты пользователя (через блюда)
       await prisma.recipe.deleteMany({
         where: {
           dish: {
@@ -74,17 +71,14 @@ export class UserService {
         },
       });
 
-      // Удаляем блюда пользователя
       await prisma.dish.deleteMany({
         where: { userId: id },
       });
 
-      // Удаляем категории пользователя (которые могут содержать блюда)
       await prisma.category.deleteMany({
         where: { userId: id },
       });
 
-      // Удаляем самого пользователя
       return prisma.user.delete({
         where: { id },
       });
@@ -93,13 +87,52 @@ export class UserService {
 
   async getUserDishes(userId: number) {
     return this.prisma.dish.findMany({
+      where: { userId: userId },
+      include: {
+        category: true,
+        ingredients: true,
+      },
+    });
+  }
+
+  async getUserDish(userId: number, dishId: number) {
+    return this.prisma.dish.findMany({
+      where: { userId: userId, id: dishId },
+      include: {
+        category: true,
+        ingredients: true,
+      },
+    });
+  }
+
+  async findAllPaginated(skip: number, take: number) {
+    return this.prisma.user.findMany({
+      skip,
+      take,
+    });
+  }
+
+  async countAll(): Promise<number> {
+    return this.prisma.user.count();
+  }
+
+  async getUserCategories(userId: number) {
+    return this.prisma.category.findMany({
       where: { userId },
       include: {
-        category: {
-          select: {
-            name: true,
-          },
-        },
+        dishes: true,
+      },
+    });
+  }
+
+  async getUserCategory(userId: number, categoryId: number) {
+    return this.prisma.category.findFirst({
+      where: {
+        id: categoryId,
+        userId: userId,
+      },
+      include: {
+        dishes: true,
       },
     });
   }
