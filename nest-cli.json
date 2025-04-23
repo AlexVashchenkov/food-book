@@ -4,8 +4,14 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-      "views/**/*",
-      "public/**/*"
+      {
+        "include": "**/views/**/*",
+        "outDir": "dist"
+      },
+      {
+        "include": "**/public/**/*",
+        "outDir": "dist"
+      }
     ],
     "deleteOutDir": true,
     "watchAssets": true
