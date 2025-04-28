@@ -127,7 +127,14 @@ export class IngredientApiController {
   @ApiParam({ name: 'ingredientId', type: Number })
   async getIngredientDishes(
     @Param('ingredientId', ParseIntPipe) ingredientId: number,
+    @Query('skip') skip: string = '0',
+    @Query('take') take: string = '10',
   ) {
-    return this.ingredientService.getIngredientDishes(ingredientId);
+    const dishes = await this.ingredientService.getIngredientDishes(
+      ingredientId,
+      +skip,
+      +take,
+    );
+    return dishes;
   }
 }

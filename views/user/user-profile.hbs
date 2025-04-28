@@ -39,7 +39,8 @@
       if (response.ok) {
         window.location.href = '/users';
       } else {
-        alert('Ошибка при удалении пользователя');
+        const error = await response.json();
+        alert(error.message || 'Ошибка при удалении блюда');
       }
     }
   });

@@ -1,8 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from './entities/category.entity';
 
 @Injectable()
 export class CategoryService {
@@ -10,13 +9,8 @@ export class CategoryService {
 
   async findAll() {
     return this.prisma.category.findMany({
-      include: {
-        dishes: {
-          select: { id: true },
-        },
-      },
       orderBy: {
-        id: 'asc',
+        name: 'asc',
       },
     });
   }
@@ -24,40 +18,19 @@ export class CategoryService {
   async findOne(id: number) {
     return this.prisma.category.findUnique({
       where: { id },
-      include: {
-        dishes: true,
-      },
     });
   }
 
   async create(createCategoryDto: CreateCategoryDto) {
     return this.prisma.category.create({
-      data: {
-        name: createCategoryDto.name,
-        color: createCategoryDto.color,
-        userId: Number(createCategoryDto.userId),
-      },
+      data: createCategoryDto,
     });
   }
 
-  async update(
-    id: number,
-    updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
-    const existingCategory = await this.prisma.category.findUnique({
-      where: { id },
-    });
-
-    if (!existingCategory) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
     return this.prisma.category.update({
-      where: { id },
-      data: {
-        name: updateCategoryDto.name ?? existingCategory.name,
-        color: updateCategoryDto.color ?? existingCategory.color,
-      },
+      where: { id: Number(id) },
+      data: updateCategoryDto,
     });
   }
 
@@ -67,9 +40,49 @@ export class CategoryService {
     });
   }
 
-  async getCategoryDishes(id: number) {
-    return this.prisma.dish.findMany({
-      where: { categoryId: id },
+  async getCategoryUser(id: number) {
+    const category = await this.prisma.category.findUnique({
+      where: { id },
+      include: {
+        user: true,
+      },
     });
+
+    return category?.user;
+  }
+
+  async getCategoryDishes(id: number, skip: number, take: number) {
+    const category = await this.prisma.category.findUnique({
+      where: { id },
+      include: {
+        dishes: {
+          skip,
+          take,
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    return category?.dishes || [];
+  }
+
+  async findAllPaginated(skip: number, take: number) {
+    return this.prisma.category.findMany({
+      skip,
+      take,
+      include: {
+        user: true,
+        dishes: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+  }
+
+  async countAll() {
+    return this.prisma.category.count();
   }
 }

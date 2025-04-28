@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Render,
+  Query,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -43,11 +44,18 @@ export class CategoryController {
     return { category };
   }
 
-  @Get(':id/dish')
-  @Render('dishes')
-  async getCategoryDishes(@Param('id') id: number) {
-    const dishes = await this.categoryService.getCategoryDishes(+id);
-    return { dishes };
+  @Get(':id/dishes')
+  async getCategoryDishes(
+    @Param('id') id: string,
+    @Query('skip') skip: string = '0',
+    @Query('take') take: string = '10',
+  ) {
+    const dishes = await this.categoryService.getCategoryDishes(
+      +id,
+      +skip,
+      +take,
+    );
+    return dishes;
   }
 
   @Post()

@@ -44,11 +44,10 @@ export class DishController {
   @Render('meal')
   async getDishById(@Param('id', ParseIntPipe) id: number) {
     const meal = await this.dishService.getDishById(id);
-    console.log('Dish:', meal); // Лог в консоль сервера
+    console.log('Dish:', meal);
     return { meal: meal };
   }
 
-  // Форма редактирования
   @Get(':id/edit')
   @Render('patch-meal')
   async editForm(@Param('id') id: number) {
@@ -60,14 +59,25 @@ export class DishController {
   @UseInterceptors(FileInterceptor('photo'))
   async updateDish(
     @Param('id') id: string,
-    @Body() updateDishDto: UpdateDishDto,
+    @Body() body: any,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    if (file) {
-      updateDishDto.photo = file.filename;
+    const updateDishDto = new UpdateDishDto();
+
+    updateDishDto.name = body.name;
+    updateDishDto.steps = body.steps;
+    updateDishDto.photo = file ? file.filename : body.currentPhoto;
+    updateDishDto.category = body.category;
+
+    if (body.ingredients) {
+      try {
+        updateDishDto.ingredients = JSON.parse(body.ingredients);
+      } catch (e) {
+        console.error('Error parsing ingredients', e);
+      }
     }
 
-    await this.dishService.update(+id, updateDishDto);
+    const updatedDish = await this.dishService.update(+id, updateDishDto);
     return { redirect: `/dishes/${id}` };
   }
 

@@ -3,8 +3,6 @@ export class Category {
   color: string;
   userId: number;
 
-  //Relations
-
   constructor(partial: Partial<Category>) {
     Object.assign(this, partial);
   }

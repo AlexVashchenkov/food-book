@@ -20,7 +20,7 @@
       <h3>Ингредиенты:</h3>
       <ol class="ingredients-list">
         {{#each meal.ingredients}}
-          <li>{{this.name}}: {{this.amount}}{{#if this.unit}}{{this.unit}}{{/if}}</li>
+          <li>{{this.name}}: {{this.amount}} {{this.unit}}</li>
         {{/each}}
       </ol>
     {{else}}

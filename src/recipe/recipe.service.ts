@@ -40,12 +40,7 @@ export class RecipeService {
     return this.prisma.recipe.create({
       data: {
         steps: createRecipeDto.steps,
-        dish: {
-          connect: { id: createRecipeDto.dishId },
-        },
-      },
-      include: {
-        dish: true,
+        dishId: createRecipeDto.dishId,
       },
     });
   }
@@ -108,5 +103,40 @@ export class RecipeService {
 
   async countAll(): Promise<number> {
     return this.prisma.recipe.count();
+  }
+
+  async getRecipeIngredients(id: number, skip: number, take: number) {
+    const recipe = await this.prisma.recipe.findUnique({
+      where: { id },
+      include: {
+        dish: {
+          include: {
+            ingredients: {
+              skip,
+              take,
+              include: {
+                ingredient: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return recipe?.dish.ingredients.map(di => ({
+      ...di.ingredient,
+      amount: di.amount,
+    })) || [];
+  }
+
+  async getRecipeDish(id: number) {
+    const recipe = await this.prisma.recipe.findUnique({
+      where: { id },
+      include: {
+        dish: true,
+      },
+    });
+
+    return recipe?.dish;
   }
 }

@@ -50,7 +50,7 @@ export class UserController {
     return { user };
   }
 
-  @Get(':id/dish')
+  @Get(':id/dishes')
   @Render('dishes')
   async getUserDishes(@Param('id') id: string) {
     const dishes = await this.userService.getUserDishes(+id);
@@ -79,7 +79,7 @@ export class UserController {
       createUserDto.photo = file.filename;
     }
 
-    const user = await this.userService.create(createUserDto);
+    await this.userService.create(createUserDto);
     return res.redirect('/users');
   }
 
@@ -114,7 +114,6 @@ export class UserController {
   @Delete(':id')
   async deleteUser(@Param('id') id: string, @Res() res: Response) {
     try {
-      const user = await this.userService.findOne(+id);
       await this.userService.remove(+id);
 
       return res.redirect('/users');
@@ -122,5 +121,35 @@ export class UserController {
       console.error('Delete error:', error);
       return res.status(500).send('Error deleting user');
     }
+  }
+
+  @Get(':id/dishes/:dishId')
+  @Render('meal')
+  async getUserDish(
+    @Param('id') userId: string,
+    @Param('dishId') dishId: string,
+  ) {
+    const dish = await this.userService.getUserDish(+userId, +dishId);
+    return { dish };
+  }
+
+  @Get(':id/categories')
+  @Render('categories')
+  async getUserCategories(@Param('id') userId: string) {
+    const categories = await this.userService.getUserCategories(+userId);
+    return { categories };
+  }
+
+  @Get(':id/categories/:categoryId')
+  @Render('category')
+  async getUserCategory(
+    @Param('id') userId: string,
+    @Param('categoryId') categoryId: string,
+  ) {
+    const category = await this.userService.getUserCategory(
+      +userId,
+      +categoryId,
+    );
+    return { category };
   }
 }

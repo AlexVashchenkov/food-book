@@ -122,6 +122,8 @@ export class UserApiController {
   @ApiOperation({ summary: 'Получить конкретное блюдо пользователя' })
   @ApiParam({ name: 'userId', type: Number })
   @ApiParam({ name: 'dishId', type: Number })
+  @ApiResponse({ status: 200, description: 'Блюдо найдено' })
+  @ApiResponse({ status: 404, description: 'Блюдо не найдено' })
   async getUserDish(
     @Param('userId', ParseIntPipe) userId: number,
     @Param('dishId', ParseIntPipe) dishId: number,
@@ -132,6 +134,7 @@ export class UserApiController {
   @Get(':userId/categories')
   @ApiOperation({ summary: 'Получить все категории блюд у пользователя' })
   @ApiParam({ name: 'userId', type: Number })
+  @ApiResponse({ status: 200, description: 'Категории найдены' })
   async getUserCategories(@Param('userId', ParseIntPipe) userId: number) {
     return this.userService.getUserCategories(userId);
   }
@@ -140,6 +143,8 @@ export class UserApiController {
   @ApiOperation({ summary: 'Получить конкретную категорию блюд пользователя' })
   @ApiParam({ name: 'userId', type: Number })
   @ApiParam({ name: 'categoryId', type: Number })
+  @ApiResponse({ status: 200, description: 'Категория найдена' })
+  @ApiResponse({ status: 404, description: 'Категория не найдена' })
   async getUserCategory(
     @Param('userId', ParseIntPipe) userId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,

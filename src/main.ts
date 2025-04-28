@@ -33,13 +33,11 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type,Accept',
   });
   app.useGlobalFilters(new HttpExceptionFilter());
-  // Регистрация частичных шаблонов
   // eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-unsafe-assignment
   const hbs = require('hbs');
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
   hbs.registerPartials(join(__dirname, '..', 'views', 'partials'));
 
-  // Регистрация хелперов
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
   hbs.registerHelper('ifEquals', function (arg1, arg2, options) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access

@@ -7,10 +7,10 @@
 
 .meal-main {
     display: flex;
+    flex-direction: row;
 }
 
 .meal-detail {
-    margin-top: 50px;
     gap: 20px;
     width: 50%;
 }

@@ -14,11 +14,11 @@ export class UserService {
 
   async findOne(id: number) {
     const user = await this.prisma.user.findUnique({
-      where: { id: id },
+      where: { id },
     });
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`Пользователь с ID ${id} не найден`);
     }
 
     return user;
@@ -36,16 +36,10 @@ export class UserService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const existingUser = await this.prisma.user.findUnique({
-      where: { id: id },
-    });
-
-    if (!existingUser) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
+    const existingUser = await this.findOne(id);
 
     return this.prisma.user.update({
-      where: { id: id },
+      where: { id },
       data: {
         name: updateUserDto.name ?? existingUser.name,
         // eslint-disable-next-line no-constant-binary-expression
@@ -57,10 +51,7 @@ export class UserService {
   }
 
   async remove(id: number) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
+    await this.findOne(id);
 
     return this.prisma.$transaction(async (prisma) => {
       await prisma.recipe.deleteMany({
@@ -85,24 +76,71 @@ export class UserService {
     });
   }
 
-  async getUserDishes(userId: number) {
+  async getUserDishes(userId: number, skip = 0, take = 10) {
     return this.prisma.dish.findMany({
-      where: { userId: userId },
+      where: { userId },
       include: {
         category: true,
         ingredients: true,
       },
+      skip,
+      take,
     });
   }
 
   async getUserDish(userId: number, dishId: number) {
-    return this.prisma.dish.findMany({
-      where: { userId: userId, id: dishId },
+    await this.findOne(userId);
+
+    const dish = await this.prisma.dish.findFirst({
+      where: { userId, id: dishId },
       include: {
         category: true,
         ingredients: true,
       },
     });
+
+    if (!dish) {
+      throw new NotFoundException(
+        `Блюдо с ID ${dishId} у пользователя с ID ${userId} не найдено`,
+      );
+    }
+
+    return dish;
+  }
+
+  async getUserCategories(userId: number, skip = 0, take = 10) {
+    await this.findOne(userId);
+
+    return this.prisma.category.findMany({
+      where: { userId },
+      include: {
+        dishes: true,
+      },
+      skip,
+      take,
+    });
+  }
+
+  async getUserCategory(userId: number, categoryId: number) {
+    await this.findOne(userId);
+
+    const category = await this.prisma.category.findFirst({
+      where: {
+        id: categoryId,
+        userId,
+      },
+      include: {
+        dishes: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException(
+        `Категория с ID ${categoryId} у пользователя с ID ${userId} не найдена`,
+      );
+    }
+
+    return category;
   }
 
   async findAllPaginated(skip: number, take: number) {
@@ -114,26 +152,5 @@ export class UserService {
 
   async countAll(): Promise<number> {
     return this.prisma.user.count();
-  }
-
-  async getUserCategories(userId: number) {
-    return this.prisma.category.findMany({
-      where: { userId },
-      include: {
-        dishes: true,
-      },
-    });
-  }
-
-  async getUserCategory(userId: number, categoryId: number) {
-    return this.prisma.category.findFirst({
-      where: {
-        id: categoryId,
-        userId: userId,
-      },
-      include: {
-        dishes: true,
-      },
-    });
   }
 }

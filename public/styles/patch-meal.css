@@ -1,14 +1,24 @@
 ﻿.ingredients-container {
     margin-top: 10px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
 }
 .ingredient-group {
     display: flex;
     margin-bottom: 10px;
     align-items: center;
     gap: 10px;
+    position: relative;
+    z-index: 2;
 }
 .ingredient-input {
     flex-grow: 1;
+}
+
+.btn-ingredient {
+    position: relative;
+    z-index: 2;
 }
 
 .btn-ingredient:hover {
@@ -18,4 +28,10 @@
     max-width: 200px;
     margin-top: 10px;
     display: block;
+}
+
+.edit-meal-container {
+    position: relative;
+    z-index: 2;
+    padding-bottom: 20px;
 }

@@ -1,0 +1,306 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Category {
+  """Уникальный идентификатор категории"""
+  id: Int!
+
+  """Название категории"""
+  name: String!
+
+  """Описание категории"""
+  description: String!
+
+  """Пользователь, создавший категорию"""
+  user: User!
+
+  """Блюда в категории"""
+  dishes(limit: Int = 10, offset: Int = 0): [Dish!]
+}
+
+type User {
+  """Уникальный идентификатор пользователя"""
+  id: Int!
+
+  """Имя пользователя"""
+  name: String!
+
+  """Возраст пользователя"""
+  age: Int!
+
+  """Пароль пользователя"""
+  password: String!
+
+  """Ссылка на фото пользователя (необязательно)"""
+  photo: String
+
+  """Категории пользователя"""
+  categories(limit: Int = 10, offset: Int = 0): [Category!]
+
+  """Блюда пользователя"""
+  dishes(limit: Int = 10, offset: Int = 0): [Dish!]
+}
+
+type Recipe {
+  """Уникальный идентификатор рецепта"""
+  id: Int!
+
+  """Название рецепта"""
+  name: String!
+
+  """Пошаговые инструкции приготовления"""
+  steps: String!
+
+  """Блюдо, к которому относится рецепт"""
+  dish: Dish!
+}
+
+type Ingredient {
+  """Уникальный идентификатор ингредиента"""
+  id: Int!
+
+  """Название ингредиента"""
+  name: String!
+
+  """Количество ингредиента"""
+  amount: String!
+
+  """Единица измерения"""
+  unit: String!
+
+  """Калории (на 100 г.)"""
+  calories: Float!
+
+  """Фото ингредиента"""
+  photo: String!
+
+  """Блюда, в которых используется ингредиент"""
+  dishes(limit: Int = 10, offset: Int = 0): [Dish!]!
+}
+
+type Dish {
+  """Уникальный идентификатор блюда"""
+  id: Int!
+
+  """Название блюда"""
+  name: String!
+
+  """Описание блюда"""
+  description: String!
+
+  """Время приготовления в минутах"""
+  cookingTime: Float!
+
+  """Сложность приготовления"""
+  difficulty: String!
+
+  """Пользователь, создавший блюдо"""
+  user: User!
+
+  """Категории блюда"""
+  categories(limit: Int = 10, offset: Int = 0): [Category!]
+
+  """Рецепт блюда"""
+  recipe: Recipe
+
+  """Ингредиенты блюда"""
+  ingredients(limit: Int = 10, offset: Int = 0): [Ingredient!]
+}
+
+type Query {
+  dishes: [Dish!]!
+  dish(id: Int!): Dish!
+  categories: [Category!]!
+  category(id: Int!): Category!
+  ingredients: [Ingredient!]!
+  ingredient(id: Int!): Ingredient!
+  recipes: [Recipe!]!
+  recipe(id: Int!): Recipe!
+  users: [User!]!
+  user(id: Int!): User!
+}
+
+type Mutation {
+  createDish(createDishInput: CreateDishInput!): Dish!
+  updateDish(updateDishInput: UpdateDishInput!): Dish!
+  removeDish(id: Int!): Boolean!
+  createCategory(createCategoryInput: CreateCategoryInput!): Category!
+  updateCategory(updateCategoryInput: UpdateCategoryInput!): Category!
+  removeCategory(id: Int!): Boolean!
+  createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
+  updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
+  removeIngredient(id: Int!): Boolean!
+  createRecipe(createRecipeInput: CreateRecipeInput!): Recipe!
+  updateRecipe(updateRecipeInput: UpdateRecipeInput!): Recipe!
+  removeRecipe(id: Int!): Boolean!
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): Boolean!
+}
+
+input CreateDishInput {
+  """Название блюда"""
+  name: String!
+
+  """Описание блюда"""
+  description: String!
+
+  """Время приготовления в минутах"""
+  cookingTime: Float!
+
+  """Сложность приготовления"""
+  difficulty: String!
+
+  """ID пользователя, создающего блюдо"""
+  userId: Int!
+
+  """Название категории блюда"""
+  category: String!
+
+  """ID категорий блюда"""
+  categoryIds: [Int!]
+}
+
+input UpdateDishInput {
+  """Название блюда"""
+  name: String
+
+  """Описание блюда"""
+  description: String
+
+  """Время приготовления в минутах"""
+  cookingTime: Float
+
+  """Сложность приготовления"""
+  difficulty: String
+
+  """ID пользователя, создающего блюдо"""
+  userId: Int
+
+  """Название категории блюда"""
+  category: String
+
+  """ID категорий блюда"""
+  categoryIds: [Int!]
+
+  """Уникальный идентификатор блюда"""
+  id: Int!
+}
+
+input CreateCategoryInput {
+  """Название категории"""
+  name: String!
+
+  """Описание категории"""
+  description: String!
+
+  """ID пользователя, создающего категорию"""
+  userId: Int!
+
+  """Цвет категории"""
+  color: String!
+}
+
+input UpdateCategoryInput {
+  """Название категории"""
+  name: String
+
+  """Описание категории"""
+  description: String
+
+  """ID пользователя, создающего категорию"""
+  userId: Int
+
+  """Цвет категории"""
+  color: String
+
+  """Уникальный идентификатор категории"""
+  id: Int!
+
+  """ID пользователя, которому принадлежит категория"""
+  usedId: Int!
+}
+
+input CreateIngredientInput {
+  """Название ингредиента"""
+  name: String!
+
+  """Количество ингредиента"""
+  amount: String!
+
+  """Единица измерения"""
+  unit: String!
+
+  """ID блюд, в которых используется ингредиент"""
+  dishIds: [Int!]!
+}
+
+input UpdateIngredientInput {
+  """Название ингредиента"""
+  name: String
+
+  """Количество ингредиента"""
+  amount: String
+
+  """Единица измерения"""
+  unit: String
+
+  """ID блюд, в которых используется ингредиент"""
+  dishIds: [Int!]
+
+  """Уникальный идентификатор ингредиента"""
+  id: Int!
+}
+
+input CreateRecipeInput {
+  """Название рецепта"""
+  name: String!
+
+  """Пошаговые инструкции приготовления"""
+  instructions: String!
+
+  """Количество порций"""
+  servings: Int!
+
+  """ID блюда, к которому относится рецепт"""
+  dishId: Int!
+
+  """Шаги приготовления"""
+  steps: String!
+}
+
+input UpdateRecipeInput {
+  """Название рецепта"""
+  name: String
+
+  """Пошаговые инструкции приготовления"""
+  instructions: String
+
+  """Количество порций"""
+  servings: Int
+
+  """ID блюда, к которому относится рецепт"""
+  dishId: Int
+
+  """Шаги приготовления"""
+  steps: String
+
+  """Уникальный идентификатор рецепта"""
+  id: Int!
+}
+
+input CreateUserInput {
+  name: String!
+  age: Int!
+  password: String!
+  photo: String
+}
+
+input UpdateUserInput {
+  name: String
+  age: Int
+  password: String
+  photo: String
+  id: Int!
+}

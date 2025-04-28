@@ -8,6 +8,7 @@
 </head>
 <body>
 {{> header}}
+
 <main>
   <div class="edit-meal-container">
     <h1 class="form-title">Редактирование блюда:</h1>
@@ -21,11 +22,6 @@
       </div>
 
       <div class="form-group">
-        <label for="userId">Id пользователя</label>
-        <input type="number" id="userId" name="userId" value="{{dish.userId}}" required readonly>
-      </div>
-
-      <div class="form-group">
         <label for="title">Название блюда:</label>
         <input type="text" id="title" name="name" value="{{dish.name}}" required>
       </div>
@@ -35,13 +31,18 @@
         <div class="ingredients-container" id="ingredientsContainer">
           {{#each dish.ingredients}}
             <div class="ingredient-group">
-              <input type="text" class="ingredient-input" name="ingredients" value="{{this.name}}" required>
+              <input type="text" class="ingredient-input" name="ingredientName" value="{{this.name}}"
+                     placeholder="Название" required>
+              <input type="number" class="ingredient-input" name="ingredientAmount" value="{{this.amount}}" step="0.01"
+                     min="0" placeholder="Количество" required>
               <button type="button" class="btn-ingredient remove-ingredient">-</button>
               <button type="button" class="btn-ingredient add-ingredient">+</button>
             </div>
           {{else}}
             <div class="ingredient-group">
-              <input type="text" class="ingredient-input" name="ingredients" required>
+              <input type="text" class="ingredient-input" name="ingredientName" placeholder="Название" required>
+              <input type="number" class="ingredient-input" name="ingredientAmount" step="0.01" min="0"
+                     placeholder="Количество" required>
               <button type="button" class="btn-ingredient remove-ingredient" disabled>-</button>
               <button type="button" class="btn-ingredient add-ingredient">+</button>
             </div>
@@ -67,7 +68,9 @@
     </form>
   </div>
 </main>
+
 {{> footer}}
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('ingredientsContainer');
@@ -86,13 +89,12 @@
     function addIngredientField() {
       const group = document.createElement('div');
       group.className = 'ingredient-group';
-
       group.innerHTML = `
-        <input type="text" class="ingredient-input" name="ingredients" required>
+        <input type="text" class="ingredient-input" name="ingredientName" placeholder="Название" required>
+        <input type="number" class="ingredient-input" name="ingredientAmount" step="0.01" min="0" placeholder="Количество" required>
         <button type="button" class="btn-ingredient remove-ingredient">-</button>
         <button type="button" class="btn-ingredient add-ingredient">+</button>
       `;
-
       container.appendChild(group);
     }
 
@@ -107,15 +109,27 @@
       e.preventDefault();
 
       const formData = new FormData(form);
-      const ingredients = Array.from(document.querySelectorAll('.ingredient-input'))
-        .map(input => input.value.trim())
-        .filter(value => value !== '');
 
-      // Очищаем старые ингредиенты и добавляем новые
-      formData.delete('ingredients[]');
-      ingredients.forEach(ingredient => {
-        formData.append('ingredients[]', ingredient);
-      });
+      const names = form.querySelectorAll('input[name="ingredientName"]');
+      const amounts = form.querySelectorAll('input[name="ingredientAmount"]');
+
+      const ingredients = [];
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i].value.trim();
+        const amount = amounts[i].value.trim();
+        if (name && amount) {
+          ingredients.push({ name, amount: Number(amount) });
+        }
+      }
+
+      const categoryInput = form.querySelector('#category');
+      const nameInput = form.querySelector('#title');
+      const stepsInput = form.querySelector('#steps');
+
+      formData.set('category', categoryInput.value.trim());
+      formData.set('name', nameInput.value.trim());
+      formData.set('steps', stepsInput.value.trim());
+      formData.set('ingredients', JSON.stringify(ingredients));
 
       try {
         const response = await fetch(form.action, {
@@ -125,15 +139,18 @@
 
         if (response.ok) {
           const result = await response.json();
-          window.location.href = `/dishes/{{dish.id}}`;
+          window.location.href = result.redirect;
         } else {
           console.error('Ошибка при сохранении изменений');
+          alert('Ошибка при сохранении изменений');
         }
       } catch (error) {
         console.error('Error:', error);
+        alert('Произошла ошибка при отправке данных');
       }
     });
   });
 </script>
+
 </body>
 </html>

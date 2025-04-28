@@ -8,60 +8,61 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  name      String
-  age       Int
-  password  String
-  photo     String?
+  id         Int        @id @default(autoincrement())
+  name       String
+  age        Int
+  password   String
+  photo      String?
   categories Category[]
-  dishes    Dish[]
+  dishes     Dish[]
 }
 
 model Category {
-  id        Int        @id @default(autoincrement())
-  name      String
-  color     String
-  userId    Int
-  user      User       @relation(fields: [userId], references: [id])
-  dishes    Dish[]
+  id     Int    @id @default(autoincrement())
+  name   String
+  color  String
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  dishes Dish[]
 }
 
 model Dish {
-  id          Int         @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   name        String
   photo       String?
   categoryId  Int
-  category    Category    @relation(fields: [categoryId], references: [id])
+  category    Category         @relation(fields: [categoryId], references: [id])
   userId      Int
-  user        User        @relation(fields: [userId], references: [id])
+  user        User             @relation(fields: [userId], references: [id])
   ingredients DishIngredient[]
+  recipeId    Int?
   recipe      Recipe?
 }
 
 model Recipe {
-  id      Int    @id @default(autoincrement())
-  steps   String
-  dishId  Int    @unique
-  dish    Dish   @relation(fields: [dishId], references: [id])
+  id     Int    @id @default(autoincrement())
+  steps  String
+  dishId Int    @unique
+  dish   Dish   @relation(fields: [dishId], references: [id])
 }
 
 model Ingredient {
-  id        Int             @id @default(autoincrement())
-  name      String          @unique
-  unit      String          // Базовая единица измерения (г, мл, шт и т.д.)
-  calories  Int?
-  photo     String?
-  dishes    DishIngredient[]
+  id       Int              @id @default(autoincrement())
+  name     String           @unique
+  unit     String // Базовая единица измерения (г, мл, шт и т.д.)
+  calories Int?
+  photo    String?
+  dishes   DishIngredient[]
 }
 
 // Таблица связи многие-ко-многим с дополнительными полями
 model DishIngredient {
-  id           Int         @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   dishId       Int
   ingredientId Int
-  amount       Float       // Количество ингредиента
-  dish         Dish        @relation(fields: [dishId], references: [id])
-  ingredient   Ingredient  @relation(fields: [ingredientId], references: [id])
+  amount       Float // Количество ингредиента
+  dish         Dish       @relation(fields: [dishId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
 
   @@unique([dishId, ingredientId]) // Уникальная пара блюдо-ингредиент
 }

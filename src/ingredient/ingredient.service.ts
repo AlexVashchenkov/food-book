@@ -29,7 +29,7 @@ export class IngredientService {
 
   async update(id: number, updateIngredientDto: UpdateIngredientDto) {
     return this.prisma.ingredient.update({
-      where: { id },
+      where: { id: Number(id) },
       data: updateIngredientDto,
     });
   }
@@ -51,12 +51,16 @@ export class IngredientService {
     return this.prisma.ingredient.count();
   }
 
-  async getIngredientDishes(id: number) {
-    return this.prisma.ingredient.findUnique({
-      where: { id },
+  async getIngredientDishes(id: number, skip: number, take: number) {
+    const dishIngredients = await this.prisma.dishIngredient.findMany({
+      where: { ingredientId: id },
+      skip,
+      take,
       include: {
-        dishes: true,
+        dish: true,
       },
     });
+
+    return dishIngredients.map(di => di.dish);
   }
 }
