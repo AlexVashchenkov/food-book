@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build && xcopy public dist\\public /E /I && xcopy views dist\\views /E /I",
+    "build": "nest build && copyfiles -u 1 views/**/* dist/views && copyfiles -u 1 public/**/* dist/public",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "postinstall": "prisma generate",
     "start": "nest start",
