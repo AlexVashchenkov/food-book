@@ -35,7 +35,6 @@ model Dish {
   userId      Int
   user        User             @relation(fields: [userId], references: [id])
   ingredients DishIngredient[]
-  recipeId    Int?
   recipe      Recipe?
 }
 
