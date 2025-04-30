@@ -15,7 +15,6 @@ model User {
   photo      String?
   categories Category[]
   dishes     Dish[]
-  ingredients Ingredient[]
 }
 
 model Category {
@@ -52,8 +51,6 @@ model Ingredient {
   unit     String
   calories Int?
   photo    String?
-  userId   Int
-  user     User             @relation(fields: [userId], references: [id])
   dishes   DishIngredient[]
 }
 

@@ -99,13 +99,14 @@ type Dish {
   user: User!
 
   """Категории блюда"""
-  categories(limit: Int = 10, offset: Int = 0): [Category!]
+  categories: [Category!]
 
   """Рецепт блюда"""
   recipe: Recipe
 
   """Ингредиенты блюда"""
   ingredients(limit: Int = 10, offset: Int = 0): [Ingredient!]
+  category: [Category!]!
 }
 
 type Query {

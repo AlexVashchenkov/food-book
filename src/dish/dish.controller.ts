@@ -59,7 +59,6 @@ export class DishController {
   @Patch(':id')
   @UseInterceptors(FileInterceptor('photo'))
   async updateDish(
-    @Request() req,
     @Param('id') id: string,
     @Body() body: any,
     @UploadedFile() file?: Express.Multer.File,
@@ -76,7 +75,7 @@ export class DishController {
       );
       updateDishDto.photo = photoUrl;
 
-      const dish = await this.dishService.getUserDish(req.user.userId, +id);
+      const dish = await this.dishService.findOne(+id);
       if (dish.photo) {
         const key = dish.photo?.split('/').pop();
         if (key) {
