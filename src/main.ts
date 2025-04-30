@@ -4,6 +4,8 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { ElapsedTimeInterceptor } from './common/interceptors/timing.interceptor';
+import * as methodOverride from 'method-override';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -27,12 +29,17 @@ async function bootstrap() {
     join(__dirname, '..', 'views', 'ingredient'),
     join(__dirname, '..', 'views', 'recipe'),
   ]);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  app.use(methodOverride('_method'));
+
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type,Accept',
   });
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new ElapsedTimeInterceptor());
+
   // eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-unsafe-assignment
   const hbs = require('hbs');
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call

@@ -50,12 +50,7 @@ export class CategoryController {
     @Query('skip') skip: string = '0',
     @Query('take') take: string = '10',
   ) {
-    const dishes = await this.categoryService.getCategoryDishes(
-      +id,
-      +skip,
-      +take,
-    );
-    return dishes;
+    return await this.categoryService.getCategoryDishes(+id, +skip, +take);
   }
 
   @Post()
@@ -69,7 +64,6 @@ export class CategoryController {
     @Param('id') id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    console.log('DTO:', updateCategoryDto);
     await this.categoryService.update(+id, updateCategoryDto);
     return { redirect: `/categories/${id}` };
   }

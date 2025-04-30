@@ -63,6 +63,19 @@
   document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('ingredientsContainer');
     const form = document.getElementById('mealForm');
+    const imagePreview = document.getElementById('imagePreview');
+    const photoInput = document.getElementById('photo');
+
+    photoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; margin-top: 10px;">`;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
 
     container.addEventListener('click', (e) => {
       if (e.target.classList.contains('add-ingredient')) {
@@ -97,34 +110,26 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const ingredients = [];
-      const names = form.querySelectorAll('.ingredient-input');
-      const amounts = form.querySelectorAll('.ingredient-amount');
+      const formData = new FormData(form);
 
-      names.forEach((input, index) => {
-        const name = input.value.trim();
-        const amount = amounts[index].value.trim();
+      const names = form.querySelectorAll('input[name="ingredientName"]');
+      const amounts = form.querySelectorAll('input[name="ingredientAmount"]');
+
+      const ingredients = [];
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i].value.trim();
+        const amount = amounts[i].value.trim();
         if (name && amount) {
           ingredients.push({ name, amount: Number(amount) });
         }
-      });
+      }
 
-      const dto = {
-        category: form.category.value.trim(),
-        userId: Number(form.userId.value),
-        name: form.name.value.trim(),
-        steps: form.steps.value.trim(),
-        ingredients,
-        photo: 'default.jpg', // пока просто строка-заглушка
-      };
+      formData.set('ingredients', JSON.stringify(ingredients));
 
       try {
         const response = await fetch(form.action, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dto),
+          body: formData,
         });
 
         if (response.ok) {

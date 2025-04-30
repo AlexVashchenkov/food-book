@@ -99,17 +99,10 @@ export class IngredientApiController {
   @ApiResponse({ status: 200, description: 'Ингредиент обновлён' })
   @ApiResponse({ status: 404, description: 'Ингредиент не найден' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateIngredientDto: UpdateIngredientDto,
   ) {
-    const updated = await this.ingredientService.update(
-      id,
-      updateIngredientDto,
-    );
-    return {
-      message: 'Ингредиент успешно обновлён',
-      ingredient: updated,
-    };
+    return await this.ingredientService.update(+id, updateIngredientDto);
   }
 
   @Delete(':id')
@@ -118,8 +111,9 @@ export class IngredientApiController {
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 204, description: 'Ингредиент удалён' })
   @ApiResponse({ status: 404, description: 'Ингредиент не найден' })
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    await this.ingredientService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.ingredientService.remove(+id);
+    return { success: true };
   }
 
   @Get(':ingredientId/dishes')

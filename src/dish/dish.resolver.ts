@@ -6,7 +6,6 @@ import {
   Int,
   ResolveField,
   Parent,
-  Info,
 } from '@nestjs/graphql';
 import { DishService } from './dish.service';
 import { Dish } from './entities/dish.graphql.entity';
@@ -16,7 +15,6 @@ import { User } from '../user/entities/user.graphql.entity';
 import { Category } from '../category/entities/category.graphql.entity';
 import { Recipe } from '../recipe/entities/recipe.graphql.entity';
 import { Ingredient } from '../ingredient/entities/ingredient.graphql.entity';
-import { GraphQLResolveInfo } from 'graphql';
 import { UseGuards } from '@nestjs/common';
 import { ComplexityGuard } from '../common/guards/complexity.guard';
 
@@ -26,8 +24,8 @@ export class DishResolver {
 
   @Query(() => [Dish], { name: 'dishes', complexity: 5 })
   @UseGuards(ComplexityGuard)
-  findAll(@Info() info: GraphQLResolveInfo) {
-    return this.dishService.getAllDishes();
+  findAll() {
+    return this.dishService.findAll();
   }
 
   @Query(() => Dish, { name: 'dish', complexity: 3 })
@@ -60,14 +58,8 @@ export class DishResolver {
   @ResolveField(() => [Category], {
     complexity: ({ args }) => 1 + args.limit,
   })
-  async categories(
-    @Parent() dish: Dish,
-    @Args('limit', { type: () => Int, nullable: true, defaultValue: 10 })
-    limit: number,
-    @Args('offset', { type: () => Int, nullable: true, defaultValue: 0 })
-    offset: number,
-  ) {
-    return this.dishService.getDishCategories(dish.id, offset, limit);
+  async category(@Parent() dish: Dish) {
+    return this.dishService.getDishCategory(dish.id);
   }
 
   @ResolveField(() => Recipe)

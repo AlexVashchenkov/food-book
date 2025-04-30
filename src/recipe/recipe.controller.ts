@@ -22,7 +22,7 @@ export class RecipeController {
   @Get(':id')
   @Render('recipe')
   async getRecipeById(@Param('id') id: number) {
-    const recipe = await this.recipeService.findOne(+id);
+    const recipe = await this.recipeService.getRecipe(+id);
     if (!recipe) {
       throw new NotFoundException('Рецепт не найден');
     }
@@ -33,8 +33,7 @@ export class RecipeController {
   @Delete(':id')
   @Render('recipes')
   async removeRecipe(@Param('id') id: number) {
-    await this.recipeService.remove(+id);
-
+    await this.recipeService.remove(id);
     return { redirect: '/recipes' };
   }
 }

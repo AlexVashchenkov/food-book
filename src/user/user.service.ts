@@ -153,4 +153,8 @@ export class UserService {
   async countAll(): Promise<number> {
     return this.prisma.user.count();
   }
+
+  async findByEmail(email: string) {
+    return this.prisma.user.findMany({ where: { name: email } });
+  }
 }

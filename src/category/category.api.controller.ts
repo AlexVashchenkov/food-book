@@ -96,14 +96,10 @@ export class CategoryApiController {
   @ApiResponse({ status: 200, description: 'Категория обновлена' })
   @ApiResponse({ status: 404, description: 'Категория не найдена' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    const updated = await this.categoryService.update(id, updateCategoryDto);
-    return {
-      message: 'Категория успешно обновлена',
-      category: updated,
-    };
+    return await this.categoryService.update(+id, updateCategoryDto);
   }
 
   @Delete(':id')
@@ -112,8 +108,9 @@ export class CategoryApiController {
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 204, description: 'Категория удалена' })
   @ApiResponse({ status: 404, description: 'Категория не найдена' })
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    await this.categoryService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.categoryService.remove(+id);
+    return { success: true };
   }
 
   @Get(':categoryId/dishes')

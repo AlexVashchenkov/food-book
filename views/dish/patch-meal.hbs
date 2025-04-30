@@ -59,9 +59,10 @@
         <label for="photo">Фотография блюда:</label>
         <input type="file" id="photo" name="photo" accept="image/*">
         {{#if dish.photo}}
-          <img src="/uploads/{{dish.photo}}" alt="Текущее фото" class="current-photo">
+          <img src="{{dish.photo}}" alt="Текущее фото" class="current-photo">
           <input type="hidden" name="currentPhoto" value="{{dish.photo}}">
         {{/if}}
+        <div id="imagePreview"></div>
       </div>
 
       <button type="submit">Сохранить изменения</button>
@@ -75,6 +76,19 @@
   document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('ingredientsContainer');
     const form = document.getElementById('mealForm');
+    const imagePreview = document.getElementById('imagePreview');
+    const photoInput = document.getElementById('photo');
+
+    photoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; margin-top: 10px;">`;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
 
     container.addEventListener('click', function(e) {
       if (e.target.classList.contains('add-ingredient')) {

@@ -14,23 +14,25 @@ import {
 import { DishService } from './dish.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateDishDto } from './dto/create-dish.dto';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { UpdateDishDto } from './dto/update-dish.dto';
+import { StorageService } from '../../storage/storage.service';
 
 @Controller('dishes')
 export class DishController {
-  constructor(private readonly dishService: DishService) {}
+  constructor(
+    private readonly dishService: DishService,
+    private readonly storageService: StorageService,
+  ) {}
 
   @Get()
   @Render('dishes')
   async getAllDishes() {
     try {
-      const dishes = await this.dishService.getAllDishes();
+      const dishes = await this.dishService.findAll();
       return { dishes };
     } catch (error) {
       console.error(error);
-      return { error: 'Failed to fetch dish' };
+      return { error: 'Failed to fetch dishes' };
     }
   }
 
@@ -43,31 +45,47 @@ export class DishController {
   @Get(':id')
   @Render('meal')
   async getDishById(@Param('id', ParseIntPipe) id: number) {
-    const meal = await this.dishService.getDishById(id);
-    console.log('Dish:', meal);
-    return { meal: meal };
+    const meal = await this.dishService.findOne(id);
+    return { meal };
   }
 
   @Get(':id/edit')
   @Render('patch-meal')
   async editForm(@Param('id') id: number) {
-    const dish = await this.dishService.getDishById(+id);
-    return { dish: dish };
+    const dish = await this.dishService.findOne(+id);
+    return { dish };
   }
 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('photo'))
   async updateDish(
+    @Request() req,
     @Param('id') id: string,
     @Body() body: any,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const updateDishDto = new UpdateDishDto();
-
     updateDishDto.name = body.name;
     updateDishDto.steps = body.steps;
-    updateDishDto.photo = file ? file.filename : body.currentPhoto;
     updateDishDto.category = body.category;
+
+    if (file) {
+      const photoUrl = await this.storageService.uploadFile(
+        file,
+        'is-web-labs-bucket',
+      );
+      updateDishDto.photo = photoUrl;
+
+      const dish = await this.dishService.getUserDish(req.user.userId, +id);
+      if (dish.photo) {
+        const key = dish.photo?.split('/').pop();
+        if (key) {
+          await this.storageService.deleteFile('is-web-labs-bucket', key);
+        }
+      }
+    } else {
+      updateDishDto.photo = body.currentPhoto;
+    }
 
     if (body.ingredients) {
       try {
@@ -77,46 +95,47 @@ export class DishController {
       }
     }
 
-    const updatedDish = await this.dishService.update(+id, updateDishDto);
+    await this.dishService.update(+id, updateDishDto);
     return { redirect: `/dishes/${id}` };
   }
 
   @Post('add')
-  @UseInterceptors(
-    FileInterceptor('photo', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, uniqueSuffix + extname(file.originalname));
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('photo'))
   async createDish(
     @Body() createDishDto: CreateDishDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (file) {
-      createDishDto.photo = file.filename;
+      const photoUrl = await this.storageService.uploadFile(
+        file,
+        'is-web-labs-bucket',
+      );
+      createDishDto.photo = photoUrl;
     }
 
     const dish = await this.dishService.create(createDishDto);
     if (!dish) {
       return { success: false, redirect: `/dishes` };
     }
-    return { success: false, redirect: `/dishes/${dish.id}` };
+    return { success: true, redirect: `/dishes/${dish.id}` };
   }
 
   @Delete(':id')
   async removeDish(@Param('id', ParseIntPipe) id: number) {
     try {
+      const dish = await this.dishService.findOne(id);
+
+      if (dish.photo) {
+        const key = dish.photo?.split('/').pop();
+        if (key) {
+          await this.storageService.deleteFile('is-web-labs-bucket', key);
+        }
+      }
+
       await this.dishService.remove(id);
       return { redirect: '/dishes' };
     } catch (error) {
       console.error(error);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       return { error: error || 'Failed to delete dish' };
     }
   }

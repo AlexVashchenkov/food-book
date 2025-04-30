@@ -115,8 +115,10 @@ export class DishService {
   }
 
   async update(id: number, updateDishDto: UpdateDishDto) {
-    const existingDish = await this.prisma.dish.findUnique({
-      where: { id },
+    const existingDish = await this.prisma.dish.findFirst({
+      where: {
+        id,
+      },
       include: { category: true },
     });
 
@@ -221,6 +223,16 @@ export class DishService {
   }
 
   async remove(id: number) {
+    const dish = await this.prisma.dish.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!dish) {
+      throw new NotFoundException(`Dish ${id} not found`);
+    }
+
     return this.prisma.$transaction(async (tx) => {
       await tx.recipe.deleteMany({ where: { dishId: id } });
       await tx.dishIngredient.deleteMany({ where: { dishId: id } });
@@ -228,7 +240,7 @@ export class DishService {
     });
   }
 
-  async getAllDishes() {
+  async findAll() {
     return this.prisma.dish.findMany({
       include: {
         category: true,
@@ -237,7 +249,7 @@ export class DishService {
     });
   }
 
-  async getDishCategories(id: number, skip: number, take: number) {
+  async getDishCategory(id: number) {
     const dish = await this.prisma.dish.findUnique({
       where: { id },
       include: {
@@ -249,7 +261,7 @@ export class DishService {
       },
     });
 
-    return dish?.category ? [dish.category] : [];
+    return dish?.category ? dish.category : null;
   }
 
   async getDishIngredients(id: number, skip: number, take: number) {
@@ -266,10 +278,12 @@ export class DishService {
       },
     });
 
-    return dish?.ingredients.map(di => ({
-      ...di.ingredient,
-      amount: di.amount,
-    })) || [];
+    return (
+      dish?.ingredients.map((di) => ({
+        ...di.ingredient,
+        amount: di.amount,
+      })) || []
+    );
   }
 
   async getDishRecipe(id: number) {
@@ -338,5 +352,56 @@ export class DishService {
     }
 
     return dish;
+  }
+
+  async getUserDishes(userId: number) {
+    return this.prisma.dish.findMany({
+      where: { userId },
+      include: {
+        category: true,
+        user: true,
+        recipe: true,
+        ingredients: {
+          include: {
+            ingredient: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getUserDish(userId: number, id: number) {
+    const dish = await this.prisma.dish.findFirst({
+      where: {
+        id,
+        userId,
+      },
+      include: {
+        category: true,
+        user: true,
+        recipe: true,
+        ingredients: {
+          include: {
+            ingredient: true,
+          },
+        },
+      },
+    });
+
+    if (!dish) throw new NotFoundException(`Dish ${id} not found`);
+
+    return {
+      id: dish.id,
+      name: dish.name,
+      photo: dish.photo,
+      category: dish.category,
+      user: dish.user,
+      recipe: dish.recipe,
+      ingredients: dish.ingredients.map((di) => ({
+        name: di.ingredient.name,
+        amount: di.amount,
+        unit: di.ingredient.unit,
+      })),
+    };
   }
 }

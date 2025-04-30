@@ -8,17 +8,28 @@ import { UserModule } from './user/user.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ElapsedTimeInterceptor } from './common/interceptors/timing.interceptor';
+import { StorageModule } from '../storage/storage.module';
+import { AppController } from './app.controller';
 
 @Module({
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ElapsedTimeInterceptor,
+    },
+  ],
   imports: [
+    StorageModule,
     DishModule,
     PrismaModule,
     CategoryModule,
     IngredientModule,
     RecipeModule,
     UserModule,
+    AppModule,
 
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

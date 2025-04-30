@@ -7,21 +7,23 @@ import {
   Patch,
   Post,
   Render,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { Res } from '@nestjs/common';
 import { Response } from 'express';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { StorageService } from '../../storage/storage.service';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly storageService: StorageService,
+  ) {}
 
   @Get()
   @Render('users')
@@ -58,25 +60,18 @@ export class UserController {
   }
 
   @Post()
-  @UseInterceptors(
-    FileInterceptor('photo', {
-      storage: diskStorage({
-        destination: './uploads/users',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, uniqueSuffix + extname(file.originalname));
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('photo'))
   async createUser(
     @Body() createUserDto: CreateUserDto,
     @Res() res: Response,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (file) {
-      createUserDto.photo = file.filename;
+      const photoUrl = await this.storageService.uploadFile(
+        file,
+        'is-web-labs-bucket',
+      );
+      createUserDto.photo = photoUrl;
     }
 
     await this.userService.create(createUserDto);
@@ -84,38 +79,46 @@ export class UserController {
   }
 
   @Patch(':id')
-  @UseInterceptors(
-    FileInterceptor('photo', {
-      storage: diskStorage({
-        destination: './uploads/users',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, uniqueSuffix + extname(file.originalname));
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('photo'))
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Res() res: Response,
     @UploadedFile() file?: Express.Multer.File,
   ) {
+    const user = await this.userService.findOne(+id);
+
     if (file) {
-      updateUserDto.photo = file.filename;
+      updateUserDto.photo = await this.storageService.uploadFile(
+        file,
+        'is-web-labs-bucket',
+      );
+
+      if (user.photo) {
+        const key = user.photo?.split('/').pop();
+        if (key) {
+          await this.storageService.deleteFile('your-bucket-name', key);
+        }
+      }
     }
 
     await this.userService.update(+id, updateUserDto);
-
     return res.redirect('/users');
   }
 
   @Delete(':id')
   async deleteUser(@Param('id') id: string, @Res() res: Response) {
     try {
-      await this.userService.remove(+id);
+      const user = await this.userService.findOne(+id);
 
+      if (user.photo) {
+        const key = user.photo?.split('/').pop();
+        if (key) {
+          await this.storageService.deleteFile('your-bucket-name', key);
+        }
+      }
+
+      await this.userService.remove(+id);
       return res.redirect('/users');
     } catch (error) {
       console.error('Delete error:', error);

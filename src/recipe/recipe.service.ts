@@ -1,7 +1,7 @@
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class RecipeService {
@@ -62,12 +62,6 @@ export class RecipeService {
     });
   }
 
-  async remove(id: number) {
-    return this.prisma.recipe.delete({
-      where: { id },
-    });
-  }
-
   async getDishesWithoutRecipes() {
     const dishesWithRecipes = await this.prisma.recipe.findMany({
       select: {
@@ -123,10 +117,12 @@ export class RecipeService {
       },
     });
 
-    return recipe?.dish.ingredients.map(di => ({
-      ...di.ingredient,
-      amount: di.amount,
-    })) || [];
+    return (
+      recipe?.dish.ingredients.map((di) => ({
+        ...di.ingredient,
+        amount: di.amount,
+      })) || []
+    );
   }
 
   async getRecipeDish(id: number) {
@@ -138,5 +134,63 @@ export class RecipeService {
     });
 
     return recipe?.dish;
+  }
+
+  async getRecipes(userId: number) {
+    return this.prisma.recipe.findMany({
+      where: {
+        dish: {
+          userId,
+        },
+      },
+      include: {
+        dish: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        id: 'asc',
+      },
+    });
+  }
+
+  async getRecipe(id: number) {
+    const recipe = await this.prisma.recipe.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        dish: {
+          include: {
+            category: true,
+            ingredients: true,
+          },
+        },
+      },
+    });
+
+    if (!recipe) {
+      throw new NotFoundException(`Recipe ${id} not found`);
+    }
+
+    return recipe;
+  }
+
+  async remove(id: number) {
+    const recipe = await this.prisma.recipe.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!recipe) {
+      throw new NotFoundException(`Recipe ${id} not found`);
+    }
+
+    return this.prisma.recipe.delete({
+      where: { id },
+    });
   }
 }

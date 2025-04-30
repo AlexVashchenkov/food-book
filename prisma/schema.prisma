@@ -15,6 +15,7 @@ model User {
   photo      String?
   categories Category[]
   dishes     Dish[]
+  ingredients Ingredient[]
 }
 
 model Category {
@@ -48,9 +49,11 @@ model Recipe {
 model Ingredient {
   id       Int              @id @default(autoincrement())
   name     String           @unique
-  unit     String // Базовая единица измерения (г, мл, шт и т.д.)
+  unit     String
   calories Int?
   photo    String?
+  userId   Int
+  user     User             @relation(fields: [userId], references: [id])
   dishes   DishIngredient[]
 }
 

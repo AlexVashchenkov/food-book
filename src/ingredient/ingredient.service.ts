@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
@@ -28,6 +28,16 @@ export class IngredientService {
   }
 
   async update(id: number, updateIngredientDto: UpdateIngredientDto) {
+    const ingredient = await this.prisma.ingredient.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!ingredient) {
+      throw new NotFoundException(`Ingredient ${id} not found`);
+    }
+
     return this.prisma.ingredient.update({
       where: { id: Number(id) },
       data: updateIngredientDto,
@@ -35,6 +45,16 @@ export class IngredientService {
   }
 
   async remove(id: number) {
+    const ingredient = await this.prisma.ingredient.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!ingredient) {
+      throw new NotFoundException(`Ingredient ${id} not found`);
+    }
+
     return this.prisma.ingredient.delete({
       where: { id },
     });
@@ -61,6 +81,6 @@ export class IngredientService {
       },
     });
 
-    return dishIngredients.map(di => di.dish);
+    return dishIngredients.map((di) => di.dish);
   }
 }

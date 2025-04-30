@@ -24,8 +24,8 @@
 
       <div class="form-group">
         <label for="image">Фотография:</label>
-        <input type="file" id="image" name="image" accept="image/*">
-        <div id="imagePreview"></div>
+        <input type="file" id="image" name="photo" accept="image/*">
+        <img id="preview" style="max-width: 200px; display: none;" />
       </div>
 
       <div class="form-group">
@@ -39,23 +39,14 @@
 </main>
 {{> footer}}
 <script>
-  document.getElementById('userForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
+  const input = document.getElementById('image');
+  const preview = document.getElementById('preview');
 
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: formData
-      });
-
-      const result = await response.json();
-      if (result.redirect) {
-        window.location.href = '/users';
-      }
-    } catch (error) {
-      console.error('Error:', error);
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
     }
   });
 </script>

@@ -11,7 +11,7 @@
 <main class="profile-main">
   <div class="profile-container">
     <div class="profile-card">
-      <img src="/uploads/users/{{user.photo}}" alt="Фото пользователя" class="profile-photo">
+      <img src="{{user.photo}}" alt="Фото пользователя" class="profile-photo" style="height: 200px; width: auto">
       <div class="profile-info">
         <h2>{{user.name}}</h2>
         <p><strong>Возраст:</strong> {{user.age}} лет</p>
@@ -40,7 +40,7 @@
         window.location.href = '/users';
       } else {
         const error = await response.json();
-        alert(error.message || 'Ошибка при удалении блюда');
+        alert(error.message || 'Ошибка при удалении пользователя');
       }
     }
   });

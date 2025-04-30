@@ -11,10 +11,8 @@
 <main>
   <div class="edit-container">
     <h1 class="form-title">Редактирование пользователя: {{user.name}}</h1>
-    <form id="userForm" action="/users/{{user.id}}" method="POST" enctype="multipart/form-data">
-      <input type="hidden" name="_method" value="PATCH">
-
-      <div class="form-group">
+    <form action="/users/{{user.id}}?_method=PATCH" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
         <label for="name">Имя:</label>
         <input type="text" id="name" name="name" value="{{user.name}}" required>
       </div>
@@ -25,12 +23,12 @@
       </div>
 
       <div class="form-group">
-        <label for="image">Фотография:</label>
+        <label for="photo">Фотография:</label>
         <div class="current-photo">
           <p>Текущее фото:</p>
-          <img src="/uploads/users/{{user.image}}" alt="Текущее фото пользователя" style="max-width: 200px;">
+          <img src="{{user.photo}}" alt="Текущее фото пользователя" style="max-width: 200px;">
         </div>
-        <input type="file" id="image" name="image" accept="image/*">
+        <input type="file" id="image" name="photo" accept="image/*">
         <div id="imagePreview"></div>
       </div>
 
@@ -39,49 +37,5 @@
   </div>
 </main>
 {{> footer}}
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-
-
-    document.getElementById('userForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
-
-      try {
-        const response = await fetch(form.action, {
-          method: 'PATCH',
-          body: formData
-        });
-
-        if (response.ok) {
-          window.location.href = `/users/{{user.id}}`;
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    });
-
-    document.getElementById('deleteForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const form = e.target;
-
-      try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          headers: {
-            'X-HTTP-Method-Override': 'DELETE'
-          }
-        });
-
-        if (response.ok) {
-          window.location.href = '/users';
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    });
-  });
-</script>
 </body>
 </html>

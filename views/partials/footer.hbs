@@ -1,3 +1,17 @@
 ﻿<footer>
   <p>Alexey Vashchenkov &copy; 2025</p>
+  {{#if serverProcessingTime}}
+    <div>
+      Server processing time: {{serverProcessingTime}}ms<br />
+      Client rendering time: <span id="client-render-time"></span>ms
+    </div>
+    <script>
+      const start = performance.now();
+      window.addEventListener('load', () => {
+        const end = performance.now();
+        const clientTime = Math.round(end - start);
+        document.getElementById('client-render-time').textContent = clientTime;
+      });
+    </script>
+  {{/if}}
 </footer>
