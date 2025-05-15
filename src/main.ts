@@ -4,7 +4,7 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { ElapsedTimeInterceptor } from './common/interceptors/timing.interceptor';
+import { ElapsedTimeInterceptor } from './common/interceptors/request-time.interceptor';
 import * as methodOverride from 'method-override';
 
 async function bootstrap() {

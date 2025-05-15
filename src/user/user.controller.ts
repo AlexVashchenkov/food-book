@@ -67,11 +67,11 @@ export class UserController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (file) {
-      const photoUrl = await this.storageService.uploadFile(
+      const photoUpload = await this.storageService.uploadFile(
         file,
         'is-web-labs-bucket',
       );
-      createUserDto.photo = photoUrl;
+      createUserDto.photo = photoUpload.location;
     }
 
     await this.userService.create(createUserDto);
@@ -89,10 +89,11 @@ export class UserController {
     const user = await this.userService.findOne(+id);
 
     if (file) {
-      updateUserDto.photo = await this.storageService.uploadFile(
+      const photoUpload = await this.storageService.uploadFile(
         file,
         'is-web-labs-bucket',
       );
+      updateUserDto.photo = photoUpload.location;
 
       if (user.photo) {
         const key = user.photo?.split('/').pop();

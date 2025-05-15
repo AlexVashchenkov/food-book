@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Patch,
@@ -16,12 +17,17 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { StorageService } from '../../storage/storage.service';
+import { CACHE_MANAGER, CacheInterceptor, Cache } from '@nestjs/cache-manager';
+import { EtagInterceptor } from '../common/interceptors/etag.interceptor';
+import { CacheControlInterceptor } from '../common/interceptors/cache-control.interceptor';
 
 @Controller('dishes')
+@UseInterceptors(CacheInterceptor, EtagInterceptor, CacheControlInterceptor)
 export class DishController {
   constructor(
     private readonly dishService: DishService,
     private readonly storageService: StorageService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   @Get()
@@ -43,6 +49,7 @@ export class DishController {
   }
 
   @Get(':id')
+  @UseInterceptors(CacheInterceptor)
   @Render('meal')
   async getDishById(@Param('id', ParseIntPipe) id: number) {
     const meal = await this.dishService.findOne(id);
@@ -64,16 +71,19 @@ export class DishController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const updateDishDto = new UpdateDishDto();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     updateDishDto.name = body.name;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     updateDishDto.steps = body.steps;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     updateDishDto.category = body.category;
 
     if (file) {
-      const photoUrl = await this.storageService.uploadFile(
+      const photoUpload = await this.storageService.uploadFile(
         file,
         'is-web-labs-bucket',
       );
-      updateDishDto.photo = photoUrl;
+      updateDishDto.photo = photoUpload.location;
 
       const dish = await this.dishService.findOne(+id);
       if (dish.photo) {
@@ -83,11 +93,14 @@ export class DishController {
         }
       }
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
       updateDishDto.photo = body.currentPhoto;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (body.ingredients) {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
         updateDishDto.ingredients = JSON.parse(body.ingredients);
       } catch (e) {
         console.error('Error parsing ingredients', e);
@@ -95,6 +108,7 @@ export class DishController {
     }
 
     await this.dishService.update(+id, updateDishDto);
+    await this.cacheManager.del(`dish:${id}`);
     return { redirect: `/dishes/${id}` };
   }
 
@@ -105,11 +119,11 @@ export class DishController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (file) {
-      const photoUrl = await this.storageService.uploadFile(
+      const photoUpload = await this.storageService.uploadFile(
         file,
         'is-web-labs-bucket',
       );
-      createDishDto.photo = photoUrl;
+      createDishDto.photo = photoUpload.location;
     }
 
     const dish = await this.dishService.create(createDishDto);
@@ -132,9 +146,11 @@ export class DishController {
       }
 
       await this.dishService.remove(id);
+      await this.cacheManager.del(`dish:${id}`);
       return { redirect: '/dishes' };
     } catch (error) {
       console.error(error);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       return { error: error || 'Failed to delete dish' };
     }
   }

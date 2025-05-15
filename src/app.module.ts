@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { DishModule } from './dish/dish.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { CategoryModule } from './category/category.module';
@@ -9,9 +9,10 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { ElapsedTimeInterceptor } from './common/interceptors/timing.interceptor';
+import { ElapsedTimeInterceptor } from './common/interceptors/request-time.interceptor';
 import { StorageModule } from '../storage/storage.module';
 import { AppController } from './app.controller';
+import { TimingMiddleware } from './common/interceptors/timing.middleware';
 
 @Module({
   controllers: [AppController],
@@ -35,7 +36,13 @@ import { AppController } from './app.controller';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       playground: true,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      context: ({ req, res }) => ({ req, res }),
     }),
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TimingMiddleware).forRoutes('*');
+  }
+}

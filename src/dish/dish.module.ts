@@ -6,10 +6,11 @@ import { UserService } from '../user/user.service';
 import { DishResolver } from './dish.resolver';
 import { DishApiController } from './dish.api.controller';
 import { StorageService } from '../../storage/storage.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   controllers: [DishController, DishApiController],
   providers: [DishService, UserService, DishResolver, StorageService],
-  imports: [PrismaModule],
+  imports: [PrismaModule, CacheModule.register()],
 })
 export class DishModule {}
