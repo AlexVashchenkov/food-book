@@ -34,7 +34,8 @@ export class CategoryController {
   @Render('category')
   async getCategoryById(@Param('id') id: number) {
     const category = await this.categoryService.findOne(+id);
-    return { category };
+    const dishes = await this.categoryService.getCategoryDishes(+id, 0, 50);
+    return { category, dishes };
   }
 
   @Get(':id/edit')

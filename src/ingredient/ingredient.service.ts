@@ -30,7 +30,7 @@ export class IngredientService {
   async update(id: number, updateIngredientDto: UpdateIngredientDto) {
     const ingredient = await this.prisma.ingredient.findFirst({
       where: {
-        id,
+        id: Number(id),
       },
     });
 
@@ -47,7 +47,7 @@ export class IngredientService {
   async remove(id: number) {
     const ingredient = await this.prisma.ingredient.findFirst({
       where: {
-        id,
+        id: Number(id),
       },
     });
 
@@ -56,7 +56,7 @@ export class IngredientService {
     }
 
     return this.prisma.ingredient.delete({
-      where: { id },
+      where: { id: Number(id) },
     });
   }
 

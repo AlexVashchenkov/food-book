@@ -23,7 +23,11 @@ export class CategoryService {
 
   async create(createCategoryDto: CreateCategoryDto) {
     return this.prisma.category.create({
-      data: createCategoryDto,
+      data: {
+        name: createCategoryDto.name,
+        color: createCategoryDto.color,
+        userId: Number(createCategoryDto.userId),
+      },
     });
   }
 
@@ -71,23 +75,6 @@ export class CategoryService {
     return category?.user;
   }
 
-  async getCategoryDishes(id: number, skip: number, take: number) {
-    const category = await this.prisma.category.findUnique({
-      where: { id },
-      include: {
-        dishes: {
-          skip,
-          take,
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
-
-    return category?.dishes || [];
-  }
-
   async findAllPaginated(skip: number, take: number) {
     return this.prisma.category.findMany({
       skip,
@@ -104,5 +91,21 @@ export class CategoryService {
 
   async countAll() {
     return this.prisma.category.count();
+  }
+
+  async getCategoryDishes(categoryId: number, skip: number, take: number) {
+    return this.prisma.dish.findMany({
+      where: {
+        categoryId: categoryId,
+      },
+      include: {
+        category: true,
+      },
+      skip,
+      take,
+      orderBy: {
+        name: 'asc',
+      },
+    });
   }
 }

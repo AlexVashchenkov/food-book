@@ -3,172 +3,162 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Блюда категории {{category.name}}</title>
+  <title>Список блюд | Кулинарная книга</title>
   {{> styles}}
   <style>
-    .dishes-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #eee;
-    }
     .dishes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 25px;
+      gap: 20px;
+      padding: 20px 20px;
     }
+
     .dish-card {
-      background: white;
-      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+
     .dish-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
+
     .dish-image {
       width: 100%;
       height: 180px;
       object-fit: cover;
     }
+
     .dish-info {
       padding: 15px;
     }
+
     .dish-name {
-      font-size: 1.2rem;
       margin: 0 0 10px 0;
-      color: #333;
+      text-decoration: none;
+      color: black;
+      font-size: 1.2rem;
     }
-    .dish-description {
+
+    .dish-category {
+      display: inline-block;
+      padding: 3px 8px;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .no-dishes {
+      text-align: center;
+      padding: 40px 0;
       color: #666;
-      font-size: 0.9rem;
-      margin-bottom: 15px;
     }
-    .dish-footer {
+
+    .page-header {
+      margin-bottom: 20px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 20px;
     }
-    .dish-price {
-      font-weight: bold;
-      color: #2e7d32;
-      font-size: 1.1rem;
+
+    .add-dish-btn {
+      display: inline-block;
+      padding: 5px 15px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
     }
-    .dish-actions {
+
+    .category-actions {
       display: flex;
       gap: 10px;
     }
-    .btn {
-      padding: 5px 12px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    .btn-edit {
-      background-color: #2196F3;
-      color: white;
+
+    .btn-edit, .btn-delete {
+      padding: 5px 10px;
       border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
     }
+
+    .btn-edit {
+      background-color: #4CAF50;
+    }
+
     .btn-delete {
       background-color: #f44336;
-      color: white;
-      border: none;
-    }
-    .add-dish-btn {
-      background-color: #4CAF50;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 4px;
-      text-decoration: none;
-    }
-    .back-btn {
-      color: #2196F3;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .no-dishes {
-      text-align: center;
-      padding: 40px;
-      background: #f9f9f9;
-      border-radius: 8px;
     }
   </style>
 </head>
 <body>
 {{> header}}
 
-<main class="dishes-container">
-  <a href="/categories" class="back-btn">← Вернуться к категориям</a>
-
+<main class="container">
   <div class="page-header">
-    <h1>Блюда категории: <span style="color: {{category.color}}">{{category.name}}</span></h1>
-    <a href="/categories/{{category.id}}/dishes/add" class="add-dish-btn">+ Добавить блюдо</a>
+    <h1>Список блюд категории {{category.name}}</h1>
+    <div class="category-actions">
+      <a href="/categories/{{category.id}}/edit" class="btn-edit">Редактировать категорию</a>
+      <button class="btn-delete" onclick="deleteCategory({{category.id}})">Удалить категорию</button>
+    </div>
+    {{#if dishes.length}}
+      <a href="/dishes/add" class="add-dish-btn">Добавить блюдо</a>
+    {{/if}}
   </div>
 
   {{#if dishes.length}}
     <div class="dishes-grid">
       {{#each dishes}}
         <div class="dish-card">
-          {{#if this.image}}
-            <img src="{{this.image}}" alt="{{this.name}}" class="dish-image">
-          {{else}}
-            <div class="dish-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
-              <span>Нет изображения</span>
+          <a href="/dishes/{{this.id}}" style="text-decoration: none; color: black">
+            {{#if this.photo}}
+              <img src="{{this.photo}}" alt="{{this.name}}" class="dish-image" style="text-decoration: none">
+            {{else}}
+              <img src="public/img/no_photo.jpg" alt="{{this.name}}" class="dish-image">
+            {{/if}}
+            <div class="dish-info">
+              <h3 class="dish-name">{{this.name}}</h3>
+              {{#if this.category}}
+                <span class="dish-category"
+                      style="background-color: {{this.category.color}};">{{this.category.name}}</span>
+              {{/if}}
             </div>
-          {{/if}}
-          <div class="dish-info">
-            <h3 class="dish-name">{{this.name}}</h3>
-            <p class="dish-description">{{this.description}}</p>
-            <div class="dish-footer">
-              <span class="dish-price">{{this.price}} ₽</span>
-              <div class="dish-actions">
-                <a href="/categories/{{../category.id}}/dishes/{{this.id}}/edit" class="btn btn-edit">Изменить</a>
-                <button onclick="deleteDish({{../category.id}}, {{this.id}})" class="btn btn-delete">Удалить</button>
-              </div>
-            </div>
-          </div>
+          </a>
         </div>
       {{/each}}
     </div>
   {{else}}
     <div class="no-dishes">
-      <p>В этой категории пока нет блюд.</p>
-      <a href="/categories/{{category.id}}/dishes/add" class="add-dish-btn">Добавить первое блюдо</a>
+      <p>Пока нет добавленных блюд. <a href="/dishes/add">Добавить первое блюдо</a></p>
     </div>
   {{/if}}
 </main>
 
 {{> footer}}
+
 <script>
-  async function deleteDish(categoryId, dishId) {
-    if (!confirm('Вы уверены, что хотите удалить это блюдо?')) return;
+  async function deleteCategory(id) {
+    if (!confirm('Вы уверены, что хотите удалить эту категорию?')) return;
 
     try {
-      const response = await fetch(`/categories/${categoryId}/dishes/${dishId}`, {
+      const response = await fetch(`/categories/${id}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
-        window.location.href = '/categories'
+        window.location.href = '/categories';
       } else {
         const error = await response.json();
         alert(error.message || 'Ошибка при удалении');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Ошибка при удалении блюда');
+      alert('Ошибка при удалении категории');
     }
   }
 </script>
