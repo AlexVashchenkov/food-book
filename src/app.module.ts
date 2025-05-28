@@ -14,6 +14,7 @@ import { StorageModule } from '../storage/storage.module';
 import { AppController } from './app.controller';
 import { TimingMiddleware } from './common/interceptors/timing.middleware';
 import { ConfigModule } from '@nestjs/config';
+import { LogUserMiddleware } from './common/interceptors/log-user-middleware';
 
 @Module({
   controllers: [AppController],
@@ -47,6 +48,10 @@ import { ConfigModule } from '@nestjs/config';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(TimingMiddleware).forRoutes('*');
+    consumer
+      .apply(TimingMiddleware)
+      .forRoutes('*')
+      .apply(LogUserMiddleware)
+      .forRoutes('*');
   }
 }
