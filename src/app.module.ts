@@ -13,6 +13,7 @@ import { ElapsedTimeInterceptor } from './common/interceptors/request-time.inter
 import { StorageModule } from '../storage/storage.module';
 import { AppController } from './app.controller';
 import { TimingMiddleware } from './common/interceptors/timing.middleware';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   controllers: [AppController],
@@ -23,6 +24,9 @@ import { TimingMiddleware } from './common/interceptors/timing.middleware';
     },
   ],
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // доступно везде
+    }),
     StorageModule,
     DishModule,
     PrismaModule,

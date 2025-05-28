@@ -1,13 +1,14 @@
 ﻿import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class StorageService {
   private s3: S3;
 
-  constructor() {
-    const accessKeyId = process.env.YC_ACCESS_KEY;
-    const secretAccessKey = process.env.YC_SECRET_KEY;
+  constructor(private readonly configService: ConfigService) {
+    const accessKeyId = this.configService.get<string>('YC_ACCESS_KEY');
+    const secretAccessKey = this.configService.get<string>('YC_SECRET_KEY');
 
     if (!accessKeyId || !secretAccessKey) {
       throw new Error('Missing Yandex Cloud credentials');
