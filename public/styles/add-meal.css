@@ -1,0 +1,27 @@
+﻿.ingredients-container {
+    margin-top: 10px;
+}
+.ingredient-group {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+    gap: 10px;
+}
+.ingredient-input {
+    flex-grow: 1;
+}
+.btn-ingredient {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-ingredient:hover {
+    background-color: #e0e0e0;
+}

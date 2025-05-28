@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавление блюда</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+
+<main>
+  <div class="edit-meal-container">
+    <h1 class="form-title">Добавление блюда:</h1>
+    <form id="mealForm" enctype="multipart/form-data" action="/dishes/add" method="POST">
+      <div class="form-group">
+        <label for="category">Категория</label>
+        <input type="text" id="category" name="category" required>
+      </div>
+
+      <div class="form-group">
+        <label for="userId">Id пользователя</label>
+        <input type="number" id="userId" name="userId" required>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Название блюда:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label>Ингредиенты:</label>
+        <div id="ingredientsContainer" class="ingredients-container">
+          <div class="ingredient-group">
+            <input type="text" name="ingredientName" class="ingredient-input" placeholder="Название" required>
+            <input type="number" name="ingredientAmount" class="ingredient-input" step="0.01" min="0"
+                   placeholder="Количество" required>
+            <button type="button" class="btn-ingredient remove-ingredient" disabled>-</button>
+            <button type="button" class="btn-ingredient add-ingredient">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="steps">Шаги приготовления:</label>
+        <textarea id="steps" name="steps" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="photo">Фотография блюда:</label>
+        <input type="file" id="photo" name="photo" accept="image/*">
+        <div id="imagePreview"></div>
+      </div>
+
+      <button type="submit">Добавить блюдо</button>
+    </form>
+  </div>
+</main>
+
+{{> footer}}
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('ingredientsContainer');
+    const form = document.getElementById('mealForm');
+    const imagePreview = document.getElementById('imagePreview');
+    const photoInput = document.getElementById('photo');
+
+    photoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; margin-top: 10px;">`;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    container.addEventListener('click', (e) => {
+      if (e.target.classList.contains('add-ingredient')) {
+        addIngredientField();
+        updateRemoveButtons();
+      } else if (e.target.classList.contains('remove-ingredient')) {
+        e.target.closest('.ingredient-group').remove();
+        updateRemoveButtons();
+      }
+    });
+
+    function addIngredientField() {
+      const group = document.createElement('div');
+      group.className = 'ingredient-group';
+      group.innerHTML = `
+        <input type="text" name="ingredientName" class="ingredient-input" placeholder="Название" required>
+        <input type="number" name="ingredientAmount" class="ingredient-amount" step="0.01" min="0" placeholder="Количество" required>
+        <button type="button" class="btn-ingredient remove-ingredient">-</button>
+        <button type="button" class="btn-ingredient add-ingredient">+</button>
+      `;
+      container.appendChild(group);
+    }
+
+    function updateRemoveButtons() {
+      const allGroups = container.querySelectorAll('.ingredient-group');
+      allGroups.forEach((group, index) => {
+        const removeBtn = group.querySelector('.remove-ingredient');
+        removeBtn.disabled = allGroups.length === 1;
+      });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      const names = form.querySelectorAll('input[name="ingredientName"]');
+      const amounts = form.querySelectorAll('input[name="ingredientAmount"]');
+
+      const ingredients = [];
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i].value.trim();
+        const amount = amounts[i].value.trim();
+        if (name && amount) {
+          ingredients.push({ name, amount: Number(amount) });
+        }
+      }
+
+      formData.set('ingredients', JSON.stringify(ingredients));
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          window.location.href = result.redirect || '/dishes';
+        } else {
+          alert('Ошибка при создании блюда');
+        }
+      } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при отправке данных');
+      }
+    });
+  });
+</script>
+</body>
+</html>

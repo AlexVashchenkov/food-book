@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Список ингредиентов</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+
+<main class="container">
+  <div class="page-header">
+    <h1>Ингредиенты</h1>
+    <a href="/ingredients/add" class="add-ingredient-btn">Добавить ингредиент</a>
+  </div>
+
+  {{#if ingredients.length}}
+    <ul class="ingredients-list">
+      {{#each ingredients}}
+        <li class="ingredient-item">
+          <div class="ingredient-info">
+            <h3>{{this.name}}</h3>
+            <p>Единица измерения: {{this.unit}}</p>
+            {{#if this.calories}}<p>Калории: {{this.calories}} на 100г</p>{{/if}}
+          </div>
+          <div class="ingredient-actions">
+            <a href="/ingredients/{{this.id}}/edit" class="btn-edit">Редактировать</a>
+            <button class="btn-delete" onclick="deleteIngredient({{this.id}})">Удалить</button>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <div class="no-ingredients">
+      <p>Пока нет ингредиентов. <a href="/ingredients/add">Добавить первый ингредиент</a></p>
+    </div>
+  {{/if}}
+</main>
+
+{{> footer}}
+
+<script src="https://unpkg.com/toaster-ui@1.1.5/dist/main.js"></script>
+<script>
+  async function deleteIngredient(id) {
+    if (!confirm('Вы уверены, что хотите удалить этот ингредиент?')) return;
+
+    try {
+      const response = await fetch(`/ingredients/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Ошибка при удалении');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ошибка при удалении ингредиента');
+    }
+  }
+</script>
+</body>
+</html>

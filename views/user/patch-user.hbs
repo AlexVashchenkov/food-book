@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактирование пользователя | {{user.name}}</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main>
+  <div class="edit-container">
+    <h1 class="form-title">Редактирование пользователя: {{user.name}}</h1>
+    <form action="/users/{{user.id}}?_method=PATCH" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" name="name" value="{{user.name}}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="age">Возраст:</label>
+        <input type="number" id="age" name="age" value="{{user.age}}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="photo">Фотография:</label>
+        <div class="current-photo">
+          <p>Текущее фото:</p>
+          <img src="{{user.photo}}" alt="Текущее фото пользователя" style="max-width: 200px;">
+        </div>
+        <input type="file" id="image" name="photo" accept="image/*">
+        <div id="imagePreview"></div>
+      </div>
+
+      <button type="submit">Сохранить изменения</button>
+    </form>
+  </div>
+</main>
+{{> footer}}
+</body>
+</html>

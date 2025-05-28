@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактирование ингредиента</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main>
+  <div class="edit-container">
+    <h1 class="form-title">Редактирование ингредиента</h1>
+    <form id="ingredientForm" method="POST" action="/ingredients/{{ingredient.id}}">
+      <input type="hidden" name="_method" value="PATCH">
+
+      <div class="form-group">
+        <label for="name">Название:</label>
+        <input type="text" id="name" name="name" value="{{ingredient.name}}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="unit">Единица измерения:</label>
+        <select id="unit" name="unit" required>
+          <option value="г" {{#if (eq ingredient.unit 'г.')}}selected{{/if}}>Граммы</option>
+          <option value="мл" {{#if (eq ingredient.unit 'мл.')}}selected{{/if}}>Миллилитры</option>
+          <option value="шт" {{#if (eq ingredient.unit 'шт.')}}selected{{/if}}>Штуки</option>
+          <option value="ч.л." {{#if (eq ingredient.unit 'ч. л.')}}selected{{/if}}>Чайные ложки</option>
+          <option value="ст.л." {{#if (eq ingredient.unit 'ст. л.')}}selected{{/if}}>Столовые ложки</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="calories">Калории (на 100г/мл):</label>
+        <input type="number" id="calories" name="calories" value="{{ingredient.calories}}">
+      </div>
+
+      <button type="submit">Сохранить ингредиент</button>
+    </form>
+  </div>
+</main>
+{{> footer}}
+<script>
+  document.getElementById('ingredientForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      name: form.name.value,
+      unit: form.unit.value,
+      calories: form.calories.value ? parseInt(form.calories.value) : null
+    };
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        window.location.href = '/ingredients';
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Ошибка при сохранении');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ошибка при сохранении ингредиента');
+    }
+  });
+</script>
+</body>
+</html>

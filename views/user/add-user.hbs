@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавление пользователя</title>
+  {{> styles}}
+</head>
+<body>
+{{> header}}
+<main>
+  <div class="edit-container">
+    <h1 class="form-title">Добавление пользователя</h1>
+    <form id="userForm" action="/users" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="age">Возраст:</label>
+        <input type="number" id="age" name="age" required>
+      </div>
+
+      <div class="form-group">
+        <label for="image">Фотография:</label>
+        <input type="file" id="image" name="photo" accept="image/*">
+        <img id="preview" style="max-width: 200px; display: none;" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль:</label>
+        <input type="text" id="password" name="password" required>
+      </div>
+
+      <button type="submit">Добавить пользователя</button>
+    </form>
+  </div>
+</main>
+{{> footer}}
+<script>
+  const input = document.getElementById('image');
+  const preview = document.getElementById('preview');
+
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>

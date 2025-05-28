@@ -1,10 +1,10 @@
 import { Controller, Get, Render } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
-  @Get()
+  @Get('/')
   @Render('index')
-  root() {
-    return { message: 'Ya lublu Mashu' };
-  }
+  @ApiBearerAuth()
+  async getIndexPage() {}
 }
